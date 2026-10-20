@@ -46,8 +46,9 @@
     define('ESTADO_ACTIVO', 1);
     define('ESTADO_INACTIVO', 2);
 
-    // Usuario administrador principal (oculto en la gestión de usuarios, no se puede modificar desde el sistema).
-    define('SUPER_ADMIN_ID', 1);
+    // Super administradores: ocultos en la gestión de usuarios; nadie puede editarlos, desactivarlos ni eliminarlos desde el sistema.
+    // 1 = admin, 26033 = sistema
+    define('SUPER_ADMIN_IDS', [1, 26033]);
 
     // Empleados (no administradores) autorizados a ELIMINAR ecos, holters y mapas, por cédula.
     // Antes estaba escrito directamente en las vistas; ahora se valida también en el servidor.

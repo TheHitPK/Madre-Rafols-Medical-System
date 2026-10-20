@@ -18,9 +18,8 @@
                                 INNER JOIN estado B        ON A.idEstado = B.idEstado
                                 INNER JOIN rol C           ON A.idRol = C.idRol
                                 INNER JOIN departamentos D ON A.idDepartamento = D.idDepartamento
-                                WHERE A.idUsuario <> :superAdmin";
+                                WHERE A.idUsuario NOT IN (" . implode(",", array_map("intval", SUPER_ADMIN_IDS)) . ")";
             $query_showUserData = Connection::connect() -> prepare($showUserDataSQL);
-            $query_showUserData -> bindValue(":superAdmin", SUPER_ADMIN_ID, PDO::PARAM_INT);
             $query_showUserData -> execute();
             return $query_showUserData -> fetchAll();
         }

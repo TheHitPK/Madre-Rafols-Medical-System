@@ -9,7 +9,7 @@
     $idUsuario = post_entero('idUsuario');
 
     // No se puede eliminar al administrador principal ni a uno mismo.
-    if ($idUsuario === null || $idUsuario === SUPER_ADMIN_ID || $idUsuario === usuario_actual_id()) {
+    if ($idUsuario === null || es_super_admin($idUsuario) || $idUsuario === usuario_actual_id()) {
         responder("4");
     }
 

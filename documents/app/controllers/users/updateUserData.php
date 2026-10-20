@@ -18,7 +18,7 @@
     if (!campos_completos($formUpdateUserData)
         || !in_array($formUpdateUserData['idRol_update'], array(ROL_ADMIN, ROL_EMPLEADO), true)
         || !in_array($formUpdateUserData['idDepartamento_update'], array(AREA_CARDIOLOGIA, AREA_IMAGENES), true)
-        || $formUpdateUserData['idUsuario'] === SUPER_ADMIN_ID) {
+        || es_super_admin($formUpdateUserData['idUsuario'])) {
         responder("4");
     }
 

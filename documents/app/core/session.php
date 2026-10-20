@@ -149,6 +149,11 @@
         return isset($_SESSION['idRol']) && (int)$_SESSION['idRol'] === ROL_ADMIN;
     }
 
+    // Super administradores (config.php): nadie puede editarlos, desactivarlos ni eliminarlos desde el sistema.
+    function es_super_admin($idUsuario){
+        return in_array((int)$idUsuario, array_map('intval', SUPER_ADMIN_IDS), true);
+    }
+
     function area_usuario(){
         return isset($_SESSION['idDepartamento']) ? (int)$_SESSION['idDepartamento'] : AREA_CARDIOLOGIA;
     }
