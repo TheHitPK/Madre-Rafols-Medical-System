@@ -1,0 +1,5 @@
+# Archivos internos que no deben abrirse desde el navegador
+RedirectMatch 404 /\.git
+<FilesMatch "^(\.gitignore|README\.md)$">
+    Require all denied
+</FilesMatch>
