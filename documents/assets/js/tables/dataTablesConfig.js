@@ -507,6 +507,8 @@ function initTablaEstudio(opciones) {
                      + eliminar + '</div>';
             } }
         ],
+        // Del más reciente al más antiguo: por fecha y, en el mismo día, por orden de registro
+        order: [[2, 'desc'], [0, 'desc']],
         responsive: true,
         language: DT_IDIOMA_ES,
         lengthChange: false,

@@ -51,5 +51,5 @@
     </table>
 
     <script>
-        initTablaSimple(<?php echo json_encode(array('id' => 'tablePacientes', 'titulo' => 'Historial de estudios - ' . $termino, 'orden' => array(array(4, 'asc'), array(1, 'desc'))), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);?>);
+        initTablaSimple(<?php echo json_encode(array('id' => 'tablePacientes', 'titulo' => 'Historial de estudios - ' . $termino, 'orden' => array(array(1, 'desc'))), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);?>);
     </script>

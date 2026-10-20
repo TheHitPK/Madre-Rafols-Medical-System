@@ -52,7 +52,7 @@
                              WHERE " . ($porCedula
                                  ? "E.cedula = :termino"
                                  : "CONCAT(E.nombre, ' ', E.apellido) LIKE :termino OR CONCAT(E.apellido, ' ', E.nombre) LIKE :termino2") . "
-                             ORDER BY E.cedula, E.fecha DESC
+                             ORDER BY E.fecha DESC, E.id DESC
                              LIMIT 500";
             $query_historial = Connection::connect() -> prepare($historialSQL);
             if ($porCedula) {
