@@ -1,0 +1,7 @@
+# Los recursos estáticos se guardan en caché del navegador por 30 días.
+# Los JS/CSS propios llevan ?v=ASSET_VERSION (config.php), así que al cambiar la versión se descargan de nuevo.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(js|css|woff2?|ttf|png|jpg|ico)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>

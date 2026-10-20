@@ -1,0 +1,4 @@
+# La plantilla común solo se usa incluida desde otras tablas
+<Files "_tablaEstudio.php">
+    Require all denied
+</Files>

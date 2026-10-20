@@ -1,0 +1,13 @@
+.bg{
+    width: 100%;
+    height: 100%;
+    background-image: url(../../img/bg_login.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.img_login{
+    width: 150px;
+    height: 150px;
+    margin: auto;
+}

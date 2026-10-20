@@ -1,0 +1,16 @@
+# Respaldos de la base de datos: contienen datos reales de pacientes y hashes de contraseñas.
+# Las migraciones (migracion_*.sql) SÍ se versionan.
+documents/app/database/*.sql
+!documents/app/database/migracion_*.sql
+
+# Exportaciones / respaldos sueltos
+*.sql.gz
+*.zip
+*.bak
+
+# Sistema operativo y editores
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
