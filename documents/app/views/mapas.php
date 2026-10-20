@@ -12,9 +12,9 @@
 	include "menu.php";
 ?>
 		<div id="layoutSidenav_content">
-			<main>
+			<main id="contenido" tabindex="-1">
 				<div class="container">
-					<h2 class="mt-3 animate__animated animate__fadeInDown"><i class="fa-solid fa-stethoscope"></i> MAPAS</h2>
+					<h1 class="h2 mt-3 animate__animated animate__fadeInDown"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i> MAPAS</h1>
 					<div class="card border border-0 shadow animate__animated animate__fadeInUp">
 						<div class="card-body">
 							<div id="container_tableMapas"></div>

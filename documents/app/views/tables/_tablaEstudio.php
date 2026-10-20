@@ -53,7 +53,7 @@
                 <th class="text-center">Cédula</th>
                 <th class="text-center">Nº de historia</th>
                 <th class="text-center">Médico</th>
-                <th class="text-center"></th>
+                <th class="text-center"><span class="visually-hidden">Acciones</span></th>
             </tr>
         </thead>
     </table>

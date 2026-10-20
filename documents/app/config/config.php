@@ -47,5 +47,5 @@
 
     // Versión de los JS/CSS propios. Subir este número al modificarlos para que los
     // navegadores descarguen la versión nueva en vez de usar la que tienen en caché.
-    define('ASSET_VERSION', '2026.10.20');
+    define('ASSET_VERSION', '2026.10.20-ux');
 ?>

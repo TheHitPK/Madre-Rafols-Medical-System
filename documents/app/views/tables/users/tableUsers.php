@@ -16,7 +16,7 @@
 				<th class="text-center">Usuario</th>
 				<th class="text-center">Rol</th>
 				<th class="text-center">Estado</th>
-				<th class="text-center"></th>
+				<th class="text-center"><span class="visually-hidden">Acciones</span></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -32,27 +32,27 @@
                         <td><?php echo e($value['cedula_usuario']);?></td>
                         <td><?php echo e($value['usuario']);?></td>
                         <td>
-                            <span style="font-size: 15px; width: 140px;" class="badge text-light shadow <?php echo $esAdmin ? "bg-primary" : "bg-info";?>">
-                                <i class="fa-solid <?php echo $esAdmin ? "fa-user-tie" : "fa-user";?>"></i>&nbsp;<?php echo e($value['rol']);?>
+                            <span style="font-size: 15px; width: 140px;" class="badge shadow <?php echo $esAdmin ? "bg-primary text-light" : "bg-info text-dark";?>">
+                                <i class="fa-solid <?php echo $esAdmin ? "fa-user-tie" : "fa-user";?>" aria-hidden="true"></i>&nbsp;<?php echo e($value['rol']);?>
                             </span>
                         </td>
                         <td>
                             <span style="font-size: 15px; width: 100px;" class="badge text-light shadow <?php echo $activo ? "bg-success" : "bg-danger";?>">
-                                <i class="fa-solid <?php echo $activo ? "fa-user-check" : "fa-user-lock";?>"></i>&nbsp;<?php echo e($value['estado']);?>
+                                <i class="fa-solid <?php echo $activo ? "fa-user-check" : "fa-user-lock";?>" aria-hidden="true"></i>&nbsp;<?php echo e($value['estado']);?>
                             </span>
                         </td>
                         <td>
-                            <div class="btn-group shadow">
+                            <div class="btn-group shadow acciones-fila" role="group" aria-label="Acciones">
                                 <?php if (!$esAdmin && $idUsuario !== usuario_actual_id()) { ?>
-                                    <span class="btn btn-sm btn-secondary" onclick="changeUserStatus(<?php echo $idUsuario;?>)">
-                                        <span class="fa-solid fa-user-gear"></span>
-                                    </span>
-                                    <span class="btn btn-sm btn-warning" onclick="obtainUserData(<?php echo $idUsuario;?>)" data-bs-toggle="modal" data-bs-target="#updateUserModal">
-                                        <span class="fa-solid fa-user-pen"></span>
-                                    </span>
-                                    <span class="btn btn-sm btn-danger" onclick="deleteUserData(<?php echo $idUsuario;?>)">
-                                        <span class="fa-solid fa-user-slash"></span>
-                                    </span>
+                                    <button type="button" class="btn btn-sm btn-secondary" onclick="changeUserStatus(<?php echo $idUsuario;?>)" title="<?php echo $activo ? 'Desactivar' : 'Activar';?>" aria-label="<?php echo ($activo ? 'Desactivar' : 'Activar') . ' a ' . e($value['usuario']);?>">
+                                        <span class="fa-solid fa-user-gear" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-warning" onclick="obtainUserData(<?php echo $idUsuario;?>)" data-bs-toggle="modal" data-bs-target="#updateUserModal" title="Editar" aria-label="Editar a <?php echo e($value['usuario']);?>">
+                                        <span class="fa-solid fa-user-pen" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteUserData(<?php echo $idUsuario;?>)" title="Eliminar" aria-label="Eliminar a <?php echo e($value['usuario']);?>">
+                                        <span class="fa-solid fa-user-slash" aria-hidden="true"></span>
+                                    </button>
                                 <?php } ?>
                             </div>
                         </td>

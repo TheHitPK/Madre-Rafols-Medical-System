@@ -35,17 +35,18 @@
         <!--CSS-->
         <link rel="stylesheet" href="documents/assets/css/estilos/estilos.css">
         <link rel="stylesheet" href="documents/assets/css/estilos/login.css">
+        <link rel="stylesheet" href="documents/assets/css/estilos/accesibilidad.css?v=<?php echo ASSET_VERSION;?>">
     </head>
     <body class="bg">
         <div id="layoutAuthentication">
             <div id="layoutAuthentication_content">
-                <main>
+                <main id="contenido">
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-5">
                                 <div class="card shadow-lg border-0 rounded-lg mt-5 animate__animated animate__fadeInDown" style="background-color: #001d3d;"> <!--style="background-color: #001d3d;"-->
                                     <div class="card-header d-flex flex-column justify-content-center">
-                                        <img src="documents/assets/img/main_logo.png" alt="MR" class="img_login">
+                                        <img src="documents/assets/img/main_logo.png" alt="Sistema de Salud Madre Rafols" class="img_login">
                                         <h1 class="text-center font-weight-light my-4 text-light">CARDIOLOGÍA</h1>
                                     </div>
                                     <form id="formLogin" class="form" action="" method="post" onsubmit="return userLogin()">
@@ -54,13 +55,18 @@
                                                 <input class="form-control" name="usuario" id="usuario" type="text" maxlength="20" autocomplete="username" autofocus placeholder="Ingrese su usuario" required>
                                                 <label for="usuario">Usuario:</label>
                                             </div>
-                                            <div class="form-floating mb-3">
-                                                <input class="form-control" name="password" id="password" type="password" autocomplete="current-password" placeholder="Ingrese su contraseña" required>
-                                                <label for="password">Contraseña:</label>
+                                            <div class="input-group mb-3">
+                                                <div class="form-floating">
+                                                    <input class="form-control" name="password" id="password" type="password" autocomplete="current-password" placeholder="Ingrese su contraseña" required>
+                                                    <label for="password">Contraseña:</label>
+                                                </div>
+                                                <button class="btn btn-light" type="button" id="verPassword" aria-controls="password" aria-pressed="false" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                                                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="card-footer text-center py-3">
-                                            <input type="submit" name="submit" class="btn btn-primary shadow" value="INICIAR SESIÓN">
+                                            <button type="submit" id="botonLogin" class="btn btn-primary shadow">INICIAR SESIÓN</button>
                                         </div>
                                     </form>
                                 </div>

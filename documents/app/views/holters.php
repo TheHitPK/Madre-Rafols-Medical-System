@@ -12,9 +12,9 @@
 	include "menu.php";
 ?>
 		<div id="layoutSidenav_content">
-			<main>
+			<main id="contenido" tabindex="-1">
 				<div class="container">
-					<h2 class="mt-3 animate__animated animate__fadeInDown"><i class="fa-solid fa-file-waveform"></i> HOLTERS</h2>
+					<h1 class="h2 mt-3 animate__animated animate__fadeInDown"><i class="fa-solid fa-file-waveform" aria-hidden="true"></i> HOLTERS</h1>
 					<div class="card border border-0 shadow animate__animated animate__fadeInUp">
 						<div class="card-body">
 							<div id="container_tableHolters"></div>

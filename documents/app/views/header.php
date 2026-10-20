@@ -30,5 +30,7 @@
 
     <!--CSS-->
     <link rel="stylesheet" href="../../assets/css/estilos/estilos.css?v=<?php echo ASSET_VERSION;?>">
+    <link rel="stylesheet" href="../../assets/css/estilos/accesibilidad.css?v=<?php echo ASSET_VERSION;?>">
 </head>
 <body class="sb-nav-fixed">
+    <a href="#contenido" class="saltar-contenido">Saltar al contenido</a>

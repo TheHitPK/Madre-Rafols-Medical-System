@@ -223,7 +223,9 @@ function botonesExportacion(opciones) {
     var titulo = function() { return tituloReporte(opciones.titulo); };
     var botonPdf = {
         extend:    'pdf',
-        text:      '<i class="fa-solid fa-file-pdf"></i>',
+        text:      '<i class="fa-solid fa-file-pdf" aria-hidden="true"></i>',
+        titleAttr: 'Exportar a PDF',
+        attr:      { 'aria-label': 'Exportar a PDF' },
         pageSize:  'A4',
         className: 'btn btn-danger',
         title:     titulo,
@@ -259,13 +261,16 @@ function botonesExportacion(opciones) {
     return [
         {
             extend:    'copy',
-            text:      '<i class="fa-solid fa-copy"></i>',
-            titleAttr: 'Copy',
+            text:      '<i class="fa-solid fa-copy" aria-hidden="true"></i>',
+            titleAttr: 'Copiar al portapapeles',
+            attr:      { 'aria-label': 'Copiar al portapapeles' },
             className: 'btn btn-dark'
         },
         {
             extend:    'print',
-            text:      '<i class="fa-solid fa-print"></i>',
+            text:      '<i class="fa-solid fa-print" aria-hidden="true"></i>',
+            titleAttr: 'Imprimir',
+            attr:      { 'aria-label': 'Imprimir' },
             className: 'btn btn-secondary',
             title:     titulo,
             // La vista de impresión es HTML: se mantienen los datos escapados para que
@@ -274,7 +279,9 @@ function botonesExportacion(opciones) {
         },
         {
             extend:    'excel',
-            text:      '<i class="fa-solid fa-file-excel"></i>',
+            text:      '<i class="fa-solid fa-file-excel" aria-hidden="true"></i>',
+            titleAttr: 'Exportar a Excel',
+            attr:      { 'aria-label': 'Exportar a Excel' },
             className: 'btn btn-success',
             title:     titulo
         },
@@ -287,10 +294,18 @@ function botonesExportacion(opciones) {
 }
 
 function botonModal(modal, html, estilo) {
-    return {
-        text: '<span class="' + estilo.clase + '" style="' + estilo.css + '" data-bs-toggle="modal" data-bs-target="' + modal + '">' + html + '</span>',
-        className: 'p-0 border-0'
+    var boton = {
+        text: '<span class="' + estilo.clase + '" style="' + estilo.css + '">' + html + '</span>',
+        className: 'p-0 border-0',
+        action: function() {
+            bootstrap.Modal.getOrCreateInstance(document.querySelector(modal)).show();
+        }
     };
+    if (estilo.nombre) {
+        boton.titleAttr = estilo.nombre;
+        boton.attr = { 'aria-label': estilo.nombre };
+    }
+    return boton;
 }
 
 function guardarJSON(clave, valor) {
@@ -390,8 +405,8 @@ function prepararFiltroFechas(columna) {
         return;
     }
     filtroFechas = {
-        min: new DateTime($('#min'), { format: 'L' }),
-        max: new DateTime($('#max'), { format: 'L' })
+        min: new DateTime($('#min'), { format: 'DD/MM/YYYY' }),
+        max: new DateTime($('#max'), { format: 'DD/MM/YYYY' })
     };
 
     $.fn.dataTable.ext.search.push(function(settings, data) {
@@ -410,7 +425,32 @@ function prepararFiltroFechas(columna) {
 
     $('#min, #max').on('change', function() {
         $.fn.dataTable.tables({ api: true }).draw();
+        actualizarIndicadorFiltro();
     });
+}
+
+// Si hay un rango de fechas aplicado, el botón de filtro lo muestra: así nadie piensa
+// que faltan registros cuando en realidad están filtrados.
+function actualizarIndicadorFiltro() {
+    var activo = !!(filtroFechas && (filtroFechas.min.val() || filtroFechas.max.val()));
+    $('.indicador-filtro').each(function() {
+        var $span = $(this);
+        $span.toggleClass('btn-info', !activo).toggleClass('btn-warning', activo);
+        $span.find('.texto-filtro').text(activo ? ' Filtro activo' : '');
+        $span.closest('button').attr('aria-label', activo ? 'Filtrar por fechas (hay un filtro activo)' : 'Filtrar por fechas')
+             .attr('title', activo ? 'Filtro por fechas activo' : 'Filtrar por fechas');
+    });
+}
+
+function limpiarFiltroFechas() {
+    if (!filtroFechas) {
+        return;
+    }
+    filtroFechas.min.val(null);
+    filtroFechas.max.val(null);
+    $('#min, #max').val('');
+    $.fn.dataTable.tables({ api: true }).draw();
+    actualizarIndicadorFiltro();
 }
 
 function escaparHtml(valor) {
@@ -439,29 +479,31 @@ function initTablaEstudio(opciones) {
         deferRender: true,
         rowId: function(d) { return 'fila-' + opciones.modulo + '-' + d.id; },
         columns: [
-            { data: null, render: function(d, tipo, fila, meta) { return meta.row + 1; } }, // N° en orden de fecha, como antes
-            { data: 'factura', className: 'text-start', render: function(factura, tipo, fila) {
+            { data: null, responsivePriority: 9, render: function(d, tipo, fila, meta) { return meta.row + 1; } }, // N° en orden de fecha, como antes
+            { data: 'factura', className: 'text-start', responsivePriority: 3, render: function(factura, tipo, fila) {
                 if (tipo !== 'display') {
                     return factura;
                 }
                 var titulo = fila.marcado && fila.marcado_por ? ' title="Marcado por ' + escaparHtml(fila.marcado_por) + ' el ' + escaparHtml(fila.marcado_en) + '"' : '';
-                return '<input type="checkbox" class="marca" data-id="' + fila.id + '"' + (fila.marcado ? ' checked' : '') + titulo + '>&nbsp; ' + escaparHtml(factura);
+                return '<input type="checkbox" class="marca" data-id="' + fila.id + '" aria-label="Marcar ' + (factura ? 'factura ' + escaparHtml(factura) : 'registro sin factura') + ' de ' + escaparHtml(fila.paciente) + '"' + (fila.marcado ? ' checked' : '') + titulo + '>&nbsp; ' + escaparHtml(factura);
             } },
-            { data: 'fecha', render: celdaTexto },
-            { data: 'c_costo', className: 'text-uppercase', render: celdaTexto },
-            { data: 'paciente', className: 'text-uppercase', render: celdaTexto },
-            { data: 'cedula', render: celdaTexto },
-            { data: 'n_historia', render: celdaTexto },
-            { data: 'medico', className: 'text-uppercase', render: celdaTexto },
-            { data: null, orderable: false, searchable: false, render: function(d, tipo, fila) {
+            { data: 'fecha', responsivePriority: 4, render: celdaTexto },
+            { data: 'c_costo', className: 'celda-mayusculas', responsivePriority: 6, render: celdaTexto },
+            { data: 'paciente', className: 'celda-mayusculas', responsivePriority: 2, render: celdaTexto },
+            { data: 'cedula', responsivePriority: 5, render: celdaTexto },
+            { data: 'n_historia', responsivePriority: 8, render: celdaTexto },
+            { data: 'medico', className: 'celda-mayusculas', responsivePriority: 7, render: celdaTexto },
+            { data: null, orderable: false, searchable: false, responsivePriority: 1, render: function(d, tipo, fila) {
                 if (tipo !== 'display') {
                     return '';
                 }
+                // Botones reales (alcanzables con Tab) con nombre que incluye al paciente
+                var paciente = escaparHtml(fila.paciente);
                 var eliminar = opciones.puedeEliminar
-                    ? '<span class="btn btn-sm btn-danger" onclick="delete' + nombre + 'Data(' + fila.id + ')"><span class="fa-solid fa-trash"></span></span>'
+                    ? '<button type="button" class="btn btn-sm btn-danger" onclick="delete' + nombre + 'Data(' + fila.id + ')" title="Eliminar" aria-label="Eliminar registro de ' + paciente + '"><span class="fa-solid fa-trash" aria-hidden="true"></span></button>'
                     : '';
-                return '<div class="btn-group shadow">'
-                     + '<span class="btn btn-sm btn-warning" onclick="obtain' + nombre + 'Data(' + fila.id + ')" data-bs-toggle="modal" data-bs-target="#update' + nombre + 'Modal"><span class="fa-solid fa-pen-to-square"></span></span>'
+                return '<div class="btn-group shadow acciones-fila" role="group" aria-label="Acciones">'
+                     + '<button type="button" class="btn btn-sm btn-warning" onclick="obtain' + nombre + 'Data(' + fila.id + ')" data-bs-toggle="modal" data-bs-target="#update' + nombre + 'Modal" title="Editar" aria-label="Editar registro de ' + paciente + '"><span class="fa-solid fa-pen-to-square" aria-hidden="true"></span></button>'
                      + eliminar + '</div>';
             } }
         ],
@@ -470,13 +512,14 @@ function initTablaEstudio(opciones) {
         lengthChange: false,
         lengthMenu: DT_LONGITUDES,
         buttons: [
-            botonModal(opciones.modalNuevo, '<span class="fa-solid fa-plus"></span> Nuevo', { clase: 'btn btn-primary', css: 'border-radius: 4px 0px 4px 4px; width: 100%;' }),
-            botonModal(opciones.modalFiltro, '<span class="fa-solid fa-filter"></span>', { clase: 'btn btn-info text-light', css: 'border-radius: 0px 0px 0px 0px; width: 100%;' })
+            botonModal(opciones.modalNuevo, '<span class="fa-solid fa-plus" aria-hidden="true"></span> Nuevo', { clase: 'btn btn-primary', css: 'border-radius: 4px 0px 4px 4px; width: 100%;' }),
+            botonModal(opciones.modalFiltro, '<span class="fa-solid fa-filter" aria-hidden="true"></span><span class="texto-filtro"></span>', { clase: 'btn btn-info text-dark indicador-filtro', css: 'border-radius: 0px 0px 0px 0px; width: 100%;', nombre: 'Filtrar por fechas' })
         ].concat(botonesExportacion(opciones))
     });
 
     tabla.buttons().container().appendTo('#' + opciones.id + '_wrapper .col-md-6:eq(0)');
     prepararMarcas(tabla, opciones);
+    actualizarIndicadorFiltro();
     return tabla;
 }
 
@@ -488,7 +531,7 @@ function initTablaUsuarios(opciones) {
         lengthChange: false,
         lengthMenu: DT_LONGITUDES,
         buttons: [
-            botonModal(opciones.modalNuevo, '<span class="fa-solid fa-user-plus"></span> Nuevo', { clase: 'btn btn-primary', css: 'border-radius: 4px 0px 4px 4px;' })
+            botonModal(opciones.modalNuevo, '<span class="fa-solid fa-user-plus" aria-hidden="true"></span> Nuevo', { clase: 'btn btn-primary', css: 'border-radius: 4px 0px 4px 4px;' })
         ].concat(botonesExportacion(opciones))
     });
 

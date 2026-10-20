@@ -10,9 +10,9 @@
 	include "menu.php";
 ?>
 		<div id="layoutSidenav_content">
-			<main>
+			<main id="contenido" tabindex="-1">
 				<div class="container-fluid px-4">
-					<h2 class="mt-3 animate__animated animate__fadeInDown"><i class="fa-solid fa-clipboard-list"></i> AUDITORÍA</h2>
+					<h1 class="h2 mt-3 animate__animated animate__fadeInDown"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i> AUDITORÍA</h1>
 					<p class="text-muted mb-3">Quién creó, editó o eliminó cada registro, y los inicios de sesión. Los estudios eliminados se pueden restaurar desde aquí. Se muestran los últimos 2000 movimientos.</p>
 					<div class="card border border-0 shadow animate__animated animate__fadeInUp">
 						<div class="card-body">

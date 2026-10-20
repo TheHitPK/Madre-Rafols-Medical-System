@@ -1,10 +1,17 @@
-<nav class="sb-topnav navbar navbar-expand navbar-dark" style="background-color: #001d3d;">
+<?php
+    // Marca el enlace de la página actual (visualmente y para lectores de pantalla)
+    function atributos_menu($archivo){
+        $actual = basename($_SERVER['SCRIPT_NAME']);
+        return $actual === $archivo ? 'class="nav-link active" aria-current="page"' : 'class="nav-link"';
+    }
+?>
+<nav class="sb-topnav navbar navbar-expand navbar-dark" aria-label="Barra superior" style="background-color: #001d3d;">
 
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="home.php"><img src="../../assets/img/main_logo.png" alt="MODINES" width="50" height="50"></a>
+    <a class="navbar-brand ps-3" href="home.php"><img src="../../assets/img/main_logo.png" alt="Cardiología - ir al inicio" width="50" height="50"></a>
 
     <!-- Sidebar Toggle-->
-    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" type="button" aria-label="Mostrar u ocultar el menú lateral"><i class="fas fa-bars"></i></button>
 
     <!-- Navbar Search-->
     <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0"></form>
@@ -13,7 +20,7 @@
     <!-- Navbar-->
     <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Menú de usuario"><i class="fas fa-user fa-fw" aria-hidden="true"></i></a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <li>
                     <form action="../controllers/sessions/userLogout.php" method="post" class="m-0">
@@ -27,34 +34,34 @@
 </nav>
 <div id="layoutSidenav">
     <div id="layoutSidenav_nav">
-        <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion" style="background-color: #001d3d;">
+        <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion" aria-label="Menú principal" style="background-color: #001d3d;">
             <div class="sb-sidenav-menu">
                 <div class="nav">
                     <div class="sb-sidenav-menu-heading">Inicio</div>
-                    <a class="nav-link" href="home.php">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-table-columns"></i></div>
+                    <a <?php echo atributos_menu('home.php');?> href="home.php">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-table-columns" aria-hidden="true"></i></div>
                         Dashboard
                     </a>
 
                     <div class="sb-sidenav-menu-heading">Exámenes</div>
 
-                    <a class="nav-link" href="ecocardiogramas.php">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-heart-circle-check"></i></div>
+                    <a <?php echo atributos_menu('ecocardiogramas.php');?> href="ecocardiogramas.php">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-heart-circle-check" aria-hidden="true"></i></div>
                         Ecocardiogramas
                     </a>
 
-                    <a class="nav-link" href="holters.php">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-file-waveform"></i></div>
+                    <a <?php echo atributos_menu('holters.php');?> href="holters.php">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-file-waveform" aria-hidden="true"></i></div>
                         Holters
                     </a>
 
-                    <a class="nav-link" href="mapas.php">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-stethoscope"></i></div>
+                    <a <?php echo atributos_menu('mapas.php');?> href="mapas.php">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i></div>
                         Mapas
                     </a>
 
-                    <a class="nav-link" href="pacientes.php">
-                        <div class="sb-nav-link-icon"><i class="fa-solid fa-hospital-user"></i></div>
+                    <a <?php echo atributos_menu('pacientes.php');?> href="pacientes.php">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-hospital-user" aria-hidden="true"></i></div>
                         Historial de pacientes
                     </a>
 
@@ -63,13 +70,13 @@
                     ?>
                             <div class="sb-sidenav-menu-heading">Módulos</div>
 
-                                <a class="nav-link" href="users.php">
-                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
+                                <a <?php echo atributos_menu('users.php');?> href="users.php">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
                                     Usuarios
                                 </a>
 
-                                <a class="nav-link" href="auditoria.php">
-                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                                <a <?php echo atributos_menu('auditoria.php');?> href="auditoria.php">
+                                    <div class="sb-nav-link-icon"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></div>
                                     Auditoría
                                 </a>
                     <?php

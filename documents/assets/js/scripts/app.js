@@ -97,3 +97,33 @@ function mostrarInfoRegistro(selector, r) {
     }
     $(selector).text(partes.join(' · '));
 }
+
+/*
+ * EVITAR GUARDAR DOS VECES
+ * Mientras un formulario espera la respuesta del servidor, su botón de envío queda
+ * desactivado y muestra "Guardando...". Antes, un doble clic o una red lenta podían
+ * registrar el mismo estudio dos veces.
+ * Los formularios llaman a su función con onsubmit="return addEcoData()"; este manejador
+ * corre justo después, cuando la petición ya salió.
+ */
+var botonesOcupados = [];
+$(document).on('submit', 'form[onsubmit]', function() {
+    var $boton = $(this).find('[type="submit"]');
+    if (!$boton.length || $boton.attr('aria-busy') === 'true') {
+        return;
+    }
+    $boton.data('htmlOriginal', $boton.html())
+          .prop('disabled', true)
+          .attr('aria-busy', 'true')
+          .html('<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Guardando...');
+    botonesOcupados.push($boton);
+});
+$(document).ajaxComplete(function() {
+    if ($.active > 1) {
+        return; // todavía hay peticiones en curso
+    }
+    $.each(botonesOcupados, function(i, $boton) {
+        $boton.prop('disabled', false).removeAttr('aria-busy').html($boton.data('htmlOriginal'));
+    });
+    botonesOcupados = [];
+});

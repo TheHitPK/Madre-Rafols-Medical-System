@@ -8,7 +8,7 @@
 	include "menu.php";
 ?>
     <div id="layoutSidenav_content">
-        <main>
+        <main id="contenido" tabindex="-1">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-6">

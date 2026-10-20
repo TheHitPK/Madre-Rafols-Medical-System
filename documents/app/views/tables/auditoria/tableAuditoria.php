@@ -41,7 +41,7 @@
                 <th>Módulo</th>
                 <th>Detalle</th>
                 <th>Equipo (IP)</th>
-                <th></th>
+                <th><span class="visually-hidden">Acciones</span></th>
             </tr>
         </thead>
         <tbody>
@@ -58,7 +58,7 @@
                                 continue;
                             }
                             $nombreCampo = isset($campos[$campo]) ? $campos[$campo] : $campo;
-                            $lista[] = '<li><strong>' . e($nombreCampo) . ':</strong> ' . e($valores[0]) . ' <i class="fa-solid fa-arrow-right"></i> ' . e($valores[1]) . '</li>';
+                            $lista[] = '<li><strong>' . e($nombreCampo) . ':</strong> ' . e($valores[0]) . ' <i class="fa-solid fa-arrow-right" role="img" aria-label="cambió a"></i>' . e($valores[1]) . '</li>';
                         }
                         if (count($lista) > 0) {
                             $detalle .= '<ul class="mb-0 small">' . implode('', $lista) . '</ul>';
@@ -70,7 +70,7 @@
                     $clave = $m['modulo'] . ':' . $m['registro_id'];
                     if ($m['accion'] === 'eliminar' && isset($enPapelera[$m['modulo']][(int)$m['registro_id']]) && !isset($ofrecidos[$clave])) {
                         $ofrecidos[$clave] = true;
-                        $boton = '<span class="btn btn-sm btn-info text-light shadow" onclick="restaurarEstudio(\'' . e($m['modulo']) . '\', ' . (int)$m['registro_id'] . ')" title="Restaurar"><i class="fa-solid fa-trash-arrow-up"></i> Restaurar</span>';
+                        $boton = '<button type="button" class="btn btn-sm btn-info text-dark shadow" onclick="restaurarEstudio(\'' . e($m['modulo']) . '\', ' . (int)$m['registro_id'] . ')"><i class="fa-solid fa-trash-arrow-up" aria-hidden="true"></i> Restaurar</button>';
                     }
 
                     echo '<tr>'
