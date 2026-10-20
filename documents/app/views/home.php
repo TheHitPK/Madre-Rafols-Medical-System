@@ -75,7 +75,7 @@
                                 </div>
 
                                 <div class="col-xl-4 col-md-4">
-                                    <div class="card bg-warning text-dark mb-4 shadow">
+                                    <div class="card bg-warning text-light mb-4 shadow">
                                         <div class="card-header">
                                             <div class="class-title">
                                                 <strong>MAPAS REALIZADOS</strong>
@@ -95,8 +95,8 @@
                                             </div>
                                         </div>
                                         <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="small text-dark stretched-link" href="mapas.php">Ver detalles<span class="visually-hidden"> de MAPA</span></a>
-                                            <div class="small text-dark">
+                                            <a class="small text-white stretched-link" href="mapas.php">Ver detalles<span class="visually-hidden"> de MAPA</span></a>
+                                            <div class="small text-white">
                                                 <i class="fas fa-angle-right" aria-hidden="true"></i>
                                             </div>
                                         </div>
@@ -134,7 +134,7 @@
                                 </div>
 
                                 <div class="col-xl-4 col-md-4">
-                                    <div class="card bg-info text-dark mb-4 shadow">
+                                    <div class="card bg-info text-light mb-4 shadow">
                                         <div class="card-header">
                                             <div class="class-title">
                                                 <strong>MÉDICOS</strong>
@@ -153,8 +153,8 @@
                                             </div>
                                         </div>
                                         <button class="btn btn-info card-footer d-flex align-items-center justify-content-between" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightMedicos" aria-controls="offcanvasRightMedicos">
-                                            <span class="small text-dark">Ver detalles<span class="visually-hidden"> de médicos</span></span>
-                                            <div class="small text-dark">
+                                            <span class="small text-white">Ver detalles<span class="visually-hidden"> de médicos</span></span>
+                                            <div class="small text-white">
                                                 <i class="fas fa-angle-right" aria-hidden="true"></i>
                                             </div>
                                         </button>
@@ -254,7 +254,7 @@
 
                             <div class="row animate__animated animate__slideInLeft">
                                 <div class="col-xl-6 col-md-6">
-                                    <div class="card bg-warning text-dark mb-4 shadow">
+                                    <div class="card bg-warning text-light mb-4 shadow">
                                         <div class="card-header">
                                             <div class="class-title">
                                                 <strong>MAPAS REALIZADOS</strong>
@@ -274,15 +274,15 @@
                                             </div>
                                         </div>
                                         <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="small text-dark stretched-link" href="mapas.php">Ver detalles<span class="visually-hidden"> de MAPA</span></a>
-                                            <div class="small text-dark">
+                                            <a class="small text-white stretched-link" href="mapas.php">Ver detalles<span class="visually-hidden"> de MAPA</span></a>
+                                            <div class="small text-white">
                                                 <i class="fas fa-angle-right" aria-hidden="true"></i>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-xl-6 col-md-6">
-                                    <div class="card bg-info text-dark mb-4 shadow">
+                                    <div class="card bg-info text-light mb-4 shadow">
                                         <div class="card-header">
                                             <div class="class-title">
                                                 <strong>MÉDICOS</strong>
@@ -301,8 +301,8 @@
                                             </div>
                                         </div>
                                         <button class="btn btn-info card-footer d-flex align-items-center justify-content-between" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightMedicos" aria-controls="offcanvasRightMedicos">
-                                            <span class="small text-dark">Ver detalles<span class="visually-hidden"> de médicos</span></span>
-                                            <div class="small text-dark">
+                                            <span class="small text-white">Ver detalles<span class="visually-hidden"> de médicos</span></span>
+                                            <div class="small text-white">
                                                 <i class="fas fa-angle-right" aria-hidden="true"></i>
                                             </div>
                                         </button>
