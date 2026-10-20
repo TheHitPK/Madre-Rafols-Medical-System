@@ -11,7 +11,8 @@
     // y dejar de usar root sin contraseña.
     define('DB_HOST', '127.0.0.1');
     define('DB_PORT', 3306);
-    define('DB_NAME', 'cardiologia');
+    // Base en uso. La base "cardiologia" (respaldo de 2023) se conserva aparte; para volver a ella, cambiar este nombre.
+    define('DB_NAME', 'cardiologia_original');
     define('DB_USER', 'root');
     define('DB_PASS', '');
 
@@ -46,5 +47,5 @@
 
     // Versión de los JS/CSS propios. Subir este número al modificarlos para que los
     // navegadores descarguen la versión nueva en vez de usar la que tienen en caché.
-    define('ASSET_VERSION', '2026.10.19-2');
+    define('ASSET_VERSION', '2026.10.20');
 ?>

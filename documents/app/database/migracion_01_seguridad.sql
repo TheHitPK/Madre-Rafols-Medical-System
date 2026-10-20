@@ -1,11 +1,10 @@
 -- =====================================================================
 -- MIGRACIÓN 2026-10-19 - Seguridad y rendimiento
--- Ejecutar UNA vez en phpMyAdmin (pestaña SQL) sobre la base `cardiologia`.
+-- Ejecutar UNA vez en phpMyAdmin: seleccionar la base del sistema a la izquierda y usar la pestaña SQL.
 -- Hacer antes un respaldo: phpMyAdmin > Exportar.
 -- Compatible con MariaDB 10.4 (XAMPP). Se puede ejecutar más de una vez sin problema.
 -- =====================================================================
 
-USE `cardiologia`;
 
 -- 1) CONTRASEÑAS
 -- La columna medía 32 caracteres (MD5). Los hashes seguros (bcrypt) miden 60+.

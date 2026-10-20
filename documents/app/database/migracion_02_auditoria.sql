@@ -1,12 +1,11 @@
 -- =====================================================================
 -- MIGRACIÓN 02 - Auditoría, papelera y marcas compartidas
--- Ejecutar DESPUÉS de migracion_01_seguridad.sql, en phpMyAdmin (pestaña SQL).
+-- Ejecutar DESPUÉS de migracion_01_seguridad.sql: en phpMyAdmin seleccionar la base del sistema y usar la pestaña SQL.
 -- Hacer antes un respaldo: phpMyAdmin > Exportar.
 -- Compatible con MariaDB 10.4 (XAMPP). Se puede ejecutar más de una vez sin problema.
 -- No modifica ni borra ningún dato existente: solo agrega columnas, índices y una tabla.
 -- =====================================================================
 
-USE `cardiologia`;
 
 -- 1) COLUMNAS DE CONTROL EN LOS ESTUDIOS
 --    marcado*    : la marca (checkbox) ahora se guarda en la base y la ven todos los equipos

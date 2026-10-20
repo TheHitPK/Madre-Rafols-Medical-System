@@ -267,7 +267,10 @@ function botonesExportacion(opciones) {
             extend:    'print',
             text:      '<i class="fa-solid fa-print"></i>',
             className: 'btn btn-secondary',
-            title:     titulo
+            title:     titulo,
+            // La vista de impresión es HTML: se mantienen los datos escapados para que
+            // un nombre con código HTML se imprima como texto y no se ejecute.
+            exportOptions: { decodeEntities: false }
         },
         {
             extend:    'excel',
@@ -304,16 +307,25 @@ function leerJSON(clave) {
  * Antes vivían en el navegador de cada PC (localStorage), así que la primera vez que cada
  * equipo abre la tabla se suben las marcas que tenía guardadas, para no perderlas.
  */
-function prepararMarcas($tabla, opciones) {
-    importarMarcasLocales($tabla, opciones);
+// Fila (datos) de un estudio por su id, aunque no esté dibujada en la página actual.
+function filaPorId(tabla, id) {
+    return tabla.row(function(indice, datos) { return datos.id === id; });
+}
 
-    $tabla.on('change', 'input.marca', function() {
+function prepararMarcas(tabla, opciones) {
+    $(tabla.table().node()).on('change', 'input.marca', function() {
         var casilla = this;
+        var id = parseInt($(casilla).data('id'), 10);
         var datos = { marcado: casilla.checked ? 1 : 0 };
-        datos[opciones.campoId] = $(casilla).data('id');
+        datos[opciones.campoId] = id;
 
         $.post(opciones.urlMarcar, datos).done(function(r) {
             if (String(r).trim() === '1') {
+                var fila = filaPorId(tabla, id);
+                var d = fila.data();
+                d.marcado = casilla.checked;
+                d.marcado_por = casilla.checked ? 'usted' : null;
+                d.marcado_en = casilla.checked ? 'hace un momento' : null;
                 casilla.title = casilla.checked ? 'Marcado por usted' : '';
             } else {
                 casilla.checked = !casilla.checked;
@@ -323,9 +335,11 @@ function prepararMarcas($tabla, opciones) {
             casilla.checked = !casilla.checked;
         });
     });
+
+    importarMarcasLocales(tabla, opciones);
 }
 
-function importarMarcasLocales($tabla, opciones) {
+function importarMarcasLocales(tabla, opciones) {
     var bandera = 'marcas_' + opciones.modulo + '_importadas';
     if (leerJSON(bandera)) {
         return;
@@ -353,12 +367,14 @@ function importarMarcasLocales($tabla, opciones) {
             return;
         }
         guardarJSON(bandera, true);
-        var $filas = $.fn.dataTable.isDataTable($tabla) ? $tabla.DataTable().rows().nodes().to$() : $tabla;
-        $filas.find('input.marca').each(function() {
-            if (ids[$(this).data('id')]) {
-                this.checked = true;
+        tabla.rows().every(function() {
+            var d = this.data();
+            if (ids[d.id] && !d.marcado) {
+                d.marcado = true;
+                this.invalidate();
             }
         });
+        tabla.draw(false);
     });
 }
 
@@ -397,15 +413,58 @@ function prepararFiltroFechas(columna) {
     });
 }
 
-// Tablas de ecos, holters y mapas
+function escaparHtml(valor) {
+    return String(valor === null || valor === undefined ? '' : valor)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// Texto de una celda: escapado al mostrarlo; tal cual para buscar, ordenar y exportar.
+function celdaTexto(dato, tipo) {
+    return tipo === 'display' ? escaparHtml(dato) : dato;
+}
+
+// Tablas de ecos, holters y mapas.
+// Los datos llegan en opciones.datos y DataTables solo dibuja las filas visibles (deferRender):
+// con miles de registros la tabla aparece en una fracción de segundo.
 function initTablaEstudio(opciones) {
     var $tabla = $('#' + opciones.id);
+    var nombre = opciones.nombre;
 
-    prepararMarcas($tabla, opciones);
     prepararFiltroFechas(2); // columna "Fecha"
     $tabla.addClass('filtro-fechas');
 
     var tabla = $tabla.DataTable({
+        data: opciones.datos,
+        deferRender: true,
+        rowId: function(d) { return 'fila-' + opciones.modulo + '-' + d.id; },
+        columns: [
+            { data: null, render: function(d, tipo, fila, meta) { return meta.row + 1; } }, // N° en orden de fecha, como antes
+            { data: 'factura', className: 'text-start', render: function(factura, tipo, fila) {
+                if (tipo !== 'display') {
+                    return factura;
+                }
+                var titulo = fila.marcado && fila.marcado_por ? ' title="Marcado por ' + escaparHtml(fila.marcado_por) + ' el ' + escaparHtml(fila.marcado_en) + '"' : '';
+                return '<input type="checkbox" class="marca" data-id="' + fila.id + '"' + (fila.marcado ? ' checked' : '') + titulo + '>&nbsp; ' + escaparHtml(factura);
+            } },
+            { data: 'fecha', render: celdaTexto },
+            { data: 'c_costo', className: 'text-uppercase', render: celdaTexto },
+            { data: 'paciente', className: 'text-uppercase', render: celdaTexto },
+            { data: 'cedula', render: celdaTexto },
+            { data: 'n_historia', render: celdaTexto },
+            { data: 'medico', className: 'text-uppercase', render: celdaTexto },
+            { data: null, orderable: false, searchable: false, render: function(d, tipo, fila) {
+                if (tipo !== 'display') {
+                    return '';
+                }
+                var eliminar = opciones.puedeEliminar
+                    ? '<span class="btn btn-sm btn-danger" onclick="delete' + nombre + 'Data(' + fila.id + ')"><span class="fa-solid fa-trash"></span></span>'
+                    : '';
+                return '<div class="btn-group shadow">'
+                     + '<span class="btn btn-sm btn-warning" onclick="obtain' + nombre + 'Data(' + fila.id + ')" data-bs-toggle="modal" data-bs-target="#update' + nombre + 'Modal"><span class="fa-solid fa-pen-to-square"></span></span>'
+                     + eliminar + '</div>';
+            } }
+        ],
         responsive: true,
         language: DT_IDIOMA_ES,
         lengthChange: false,
@@ -417,6 +476,7 @@ function initTablaEstudio(opciones) {
     });
 
     tabla.buttons().container().appendTo('#' + opciones.id + '_wrapper .col-md-6:eq(0)');
+    prepararMarcas(tabla, opciones);
     return tabla;
 }
 
