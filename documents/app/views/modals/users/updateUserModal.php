@@ -52,6 +52,22 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col">
+                            <label for="idDepartamento_update" class="form-label mb-1">Área:</label>
+                            <select class="form-select" name="idDepartamento_update" id="idDepartamento_update" aria-describedby="ayudaArea_update" required>
+                                <option value="">Seleccione...</option>
+                                <?php
+                                    foreach ($showDepartamentoData as $key => $value) {
+                                ?>
+                                        <option value="<?php echo (int)$value[0];?>"><?php echo e($value[1]);?></option>
+                                <?php
+                                    }
+                                ?>
+                            </select>
+                            <div class="form-text" id="ayudaArea_update">Un empleado solo ve los módulos de su área. Los administradores ven todas.</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
                             <label for="password_update" class="form-label mb-1">Nueva contraseña:</label>
                             <input type="password" name="password_update" id="password_update" class="form-control" placeholder="Dejar en blanco para no cambiarla" autocomplete="new-password">
                         </div>

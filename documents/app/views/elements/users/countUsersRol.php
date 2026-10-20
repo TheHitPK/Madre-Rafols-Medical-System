@@ -6,15 +6,16 @@
 
     $Users = new Users();
     $showCountUsersAdminData = $Users -> showCountUsersAdminData();
-    $showCountUsersEmpleadosData = $Users -> showCountUsersEmpleadosData();
+    $empleadosPorArea = array(array('Empleados Cardiología', 'bg-success', $Users -> showCountUsersAreaData(AREA_CARDIOLOGIA)),
+                              array('Empleados Imágenes', 'bg-secondary', $Users -> showCountUsersAreaData(AREA_IMAGENES)));
 ?>
 
     <table class="table display compact nowrap text-light" style="border-color: #001d3d;">
         <tbody>
             <tr>
                 <td>
-                    <span class="badge text-light shadow bg-primary shadow" style="font-size: 15px; width: 140px;">
-                        <i class='fa-solid fa-user-tie'></i> Administrador
+                    <span class="badge text-light shadow bg-primary shadow" style="font-size: 15px; width: 200px;">
+                        <i class='fa-solid fa-user-tie' aria-hidden="true"></i> Administradores
                     </span>
                 </td>
                 <td class="d-flex justify-content-end">
@@ -25,20 +26,17 @@
                     ?>
                 </td>
             </tr>
+            <?php foreach ($empleadosPorArea as $fila) { ?>
             <tr>
                 <td>
-                    <span class="badge text-light shadow bg-success shadow" style="font-size: 15px; width: 140px;">
-                        <i class='fa-solid fa-user'></i> Empleado(s)
+                    <span class="badge text-light shadow <?php echo $fila[1];?>" style="font-size: 15px; width: 200px;">
+                        <i class='fa-solid fa-user' aria-hidden="true"></i> <?php echo e($fila[0]);?>
                     </span>
                 </td>
                 <td class="d-flex justify-content-end">
-                    <?php
-                        foreach ($showCountUsersEmpleadosData as $key => $value) {
-                            echo (int)$value[0];
-                        }
-                    ?>
+                    <?php echo (int)$fila[2];?>
                 </td>
             </tr>
+            <?php } ?>
         </tbody>
     </table>
-

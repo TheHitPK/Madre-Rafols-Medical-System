@@ -2,9 +2,11 @@
     require_once "Connection.php";
 
     /*
-     * MODELO COMÚN DE ESTUDIOS (ecos, holters, mapas)
-     * Las tres tablas tienen la misma estructura y solo cambia el sufijo de las columnas
+     * MODELO COMÚN DE ESTUDIOS (ecos, holters, mapas, imágenes)
+     * Las tablas tienen la misma estructura y solo cambia el sufijo de las columnas
      * (factura_eco, factura_holter, factura_mapa...). Cada modelo hijo define su tabla y sufijo.
+     * Un módulo con datos propios (Imágenes: tipo de estudio) los declara en camposExtra(),
+     * selectExtra() y joinExtra().
      *
      * Los estudios no se borran físicamente: "eliminar" los manda a la papelera (eliminado_en)
      * y un administrador puede restaurarlos desde Auditoría.
@@ -41,6 +43,25 @@
             return $this -> ultimoId;
         }
 
+        // Área a la que pertenece el módulo (quién puede verlo).
+        public function area(){
+            return AREA_CARDIOLOGIA;
+        }
+
+        // Columnas enteras adicionales que llegan del formulario con el mismo nombre (idTipoEstudio).
+        public function camposExtra(){
+            return array();
+        }
+
+        // Columnas y uniones adicionales para el listado y el formulario de edición.
+        protected function selectExtra(){
+            return "";
+        }
+
+        protected function joinExtra(){
+            return "";
+        }
+
         public function columna($nombre){
             $s = $this -> sufijo;
             $columnas = array('factura'    => "factura_$s",
@@ -66,9 +87,11 @@
                                  M.usuario AS marcado_por,
                                  B.c_costo,
                                  C.medico
+                                 {$this->selectExtra()}
                           FROM {$this->tabla} A
                           INNER JOIN c_costo B ON A.idC_costo = B.idC_costo
                           INNER JOIN medicos C ON A.idMedico = C.idMedico
+                          {$this->joinExtra()}
                           LEFT JOIN usuarios M ON A.marcado_por = M.idUsuario
                           WHERE A.eliminado_en IS NULL
                           ORDER BY A.{$this->columna('fecha')} ASC, A.{$this->campoId} ASC";
@@ -103,7 +126,13 @@
             if (self::existeFactura($datos['cedula'], $datos['factura'])) {
                 return 2;
             }
-            $agregarSQL = "INSERT INTO {$this->tabla} (idC_costo,
+            $columnasExtra = "";
+            $valoresExtra  = "";
+            foreach ($this -> camposExtra() as $campo) {
+                $columnasExtra .= "$campo, ";
+                $valoresExtra  .= ":$campo, ";
+            }
+            $agregarSQL = "INSERT INTO {$this->tabla} ({$columnasExtra}idC_costo,
                                                        idMedico,
                                                        {$this->columna('factura')},
                                                        {$this->columna('fecha')},
@@ -113,7 +142,7 @@
                                                        {$this->columna('n_historia')},
                                                        creado_por,
                                                        creado_en)
-                           VALUES (:idC_costo, :idMedico, :factura, :fecha, :nombre, :apellido, :cedula, :n_historia, :usuario, NOW())";
+                           VALUES ({$valoresExtra}:idC_costo, :idMedico, :factura, :fecha, :nombre, :apellido, :cedula, :n_historia, :usuario, NOW())";
             $query_agregar = Connection::connect() -> prepare($agregarSQL);
             self::bindDatos($query_agregar, $datos);
             $query_agregar -> bindValue(":usuario", $idUsuario, PDO::PARAM_INT);
@@ -130,9 +159,11 @@
             $obtenerSQL = "SELECT A.*, B.c_costo, C.medico,
                                   U1.usuario AS creado_por_usuario,
                                   U2.usuario AS modificado_por_usuario
+                                  {$this->selectExtra()}
                            FROM {$this->tabla} A
                            INNER JOIN c_costo B ON A.idC_costo = B.idC_costo
                            INNER JOIN medicos C ON A.idMedico = C.idMedico
+                           {$this->joinExtra()}
                            LEFT JOIN usuarios U1 ON A.creado_por = U1.idUsuario
                            LEFT JOIN usuarios U2 ON A.modificado_por = U2.idUsuario
                            WHERE A.{$this->campoId} = :id"
@@ -147,8 +178,12 @@
             if (self::existeFactura($datos['cedula'], $datos['factura'], $datos['id'])) {
                 return 2;
             }
+            $asignacionesExtra = "";
+            foreach ($this -> camposExtra() as $campo) {
+                $asignacionesExtra .= "$campo = :$campo, ";
+            }
             $actualizarSQL = "UPDATE {$this->tabla}
-                              SET idC_costo                        = :idC_costo,
+                              SET {$asignacionesExtra}idC_costo    = :idC_costo,
                                   idMedico                         = :idMedico,
                                   {$this->columna('factura')}      = :factura,
                                   {$this->columna('fecha')}        = :fecha,
@@ -254,6 +289,9 @@
             $query -> bindValue(":apellido", $datos['apellido'], PDO::PARAM_STR);
             $query -> bindValue(":cedula", $datos['cedula'], PDO::PARAM_INT);
             $query -> bindValue(":n_historia", $datos['n_historia'], PDO::PARAM_INT);
+            foreach ($this -> camposExtra() as $campo) {
+                $query -> bindValue(":$campo", $datos[$campo], PDO::PARAM_INT);
+            }
         }
     }
 ?>

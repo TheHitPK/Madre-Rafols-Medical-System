@@ -1,6 +1,7 @@
 <?php
 	require_once __DIR__ . "/../core/bootstrap.php";
 	requerir_login_pagina();
+	requerir_area_pagina(AREA_CARDIOLOGIA);
 
 	$pageTitle = "Ecocardiogramas";
 	$usaTablas = true;

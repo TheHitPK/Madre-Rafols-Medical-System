@@ -12,9 +12,12 @@
                              'cedula_usuario'   => post_entero('cedula_usuario'),
                              'usuario'          => post_texto('usuario', 20),
                              'password'         => isset($_POST['password']) ? (string)$_POST['password'] : '',
-                             'idRol'            => post_entero('idRol'));
+                             'idRol'            => post_entero('idRol'),
+                             'idDepartamento'   => post_entero('idDepartamento'));
 
-    if (!campos_completos($formAddUserData) || !in_array($formAddUserData['idRol'], array(ROL_ADMIN, ROL_EMPLEADO), true)) {
+    if (!campos_completos($formAddUserData)
+        || !in_array($formAddUserData['idRol'], array(ROL_ADMIN, ROL_EMPLEADO), true)
+        || !in_array($formAddUserData['idDepartamento'], array(AREA_CARDIOLOGIA, AREA_IMAGENES), true)) {
         responder("4");
     }
     if (strlen($formAddUserData['password']) < PASSWORD_MIN_LENGTH) {
@@ -25,7 +28,7 @@
     $resultado = $Users -> addUserData($formAddUserData);
     if ($resultado === 1) {
         $nuevo = $Users -> obtainUserData((int)Connection::connect() -> lastInsertId());
-        auditar('crear', 'usuarios', (int)$nuevo['idUsuario'], "Usuario " . $nuevo['usuario'] . " (" . $nuevo['rol'] . ")", null, $nuevo);
+        auditar('crear', 'usuarios', (int)$nuevo['idUsuario'], "Usuario " . $nuevo['usuario'] . " (" . $nuevo['rol'] . " - " . $nuevo['departamento'] . ")", null, $nuevo);
     }
     echo $resultado;
 ?>

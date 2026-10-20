@@ -12,10 +12,12 @@
                                 'apellido_usuario_update' => post_texto('apellido_usuario_update'),
                                 'cedula_usuario_update'   => post_entero('cedula_usuario_update'),
                                 'usuario_update'          => post_texto('usuario_update', 20),
-                                'idRol_update'            => post_entero('idRol_update'));
+                                'idRol_update'            => post_entero('idRol_update'),
+                                'idDepartamento_update'   => post_entero('idDepartamento_update'));
 
     if (!campos_completos($formUpdateUserData)
         || !in_array($formUpdateUserData['idRol_update'], array(ROL_ADMIN, ROL_EMPLEADO), true)
+        || !in_array($formUpdateUserData['idDepartamento_update'], array(AREA_CARDIOLOGIA, AREA_IMAGENES), true)
         || $formUpdateUserData['idUsuario'] === SUPER_ADMIN_ID) {
         responder("4");
     }

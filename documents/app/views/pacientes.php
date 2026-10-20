@@ -23,7 +23,7 @@
 									<button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Buscar</button>
 								</div>
 							</form>
-							<div class="form-text" id="ayudaBusquedaPaciente">Muestra los ecocardiogramas, holters y MAPA del paciente juntos.</div>
+							<div class="form-text" id="ayudaBusquedaPaciente"><?php echo es_admin() ? "Muestra juntos todos los estudios del paciente: cardiología e imágenes." : (area_usuario() === AREA_IMAGENES ? "Muestra juntos todos los estudios de imágenes del paciente." : "Muestra los ecocardiogramas, holters y MAPA del paciente juntos.");?></div>
 						</div>
 					</div>
 					<div class="card border border-0 shadow animate__animated animate__fadeInUp">

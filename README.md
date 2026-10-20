@@ -1,6 +1,8 @@
 # Sistema de Cardiología
 
-Registro de ecocardiogramas, holters y MAPA del Departamento de Cardiología, para uso en la red local.
+Registro de estudios para uso en la red local, por áreas:
+- **Cardiología**: ecocardiogramas, holters y MAPA.
+- **Imágenes**: qué tipo de estudio se hizo (Rayos X, ecografía, tomografía...) y, opcionalmente, el informe médico en PDF o Word.
 PHP 8.1 + MariaDB 10.4 (XAMPP), Bootstrap 5, jQuery y DataTables. Funciona sin internet.
 
 ## Instalación / actualización
@@ -13,10 +15,12 @@ PHP 8.1 + MariaDB 10.4 (XAMPP), Bootstrap 5, jQuery y DataTables. Funciona sin i
 2. **Migraciones**: en phpMyAdmin → pestaña SQL, ejecutar en este orden:
    1. `documents/app/database/migracion_01_seguridad.sql` (contraseñas seguras, índices).
    2. `documents/app/database/migracion_02_auditoria.sql` (auditoría, papelera, marcas compartidas).
+   3. `documents/app/database/migracion_03_imagenes.sql` (áreas y módulo de Imágenes; los usuarios actuales quedan en Cardiología).
 
    Se pueden ejecutar más de una vez sin problema.
 3. **Código**: copiar la carpeta del proyecto a `C:\xampp\htdocs\`.
-4. **Configuración**: revisar `documents/app/config/config.php` (datos de conexión, cédulas autorizadas a eliminar, tiempo de sesión).
+4. **Configuración**: revisar `documents/app/config/config.php` (datos de conexión, cédulas autorizadas a eliminar, tiempo de sesión,
+   carpeta de informes `INFORMES_DIR`).
 5. **Sacar el respaldo de datos de la carpeta web**: `documents/app/database/cardiologia.sql` contiene datos reales de pacientes.
    Está bloqueado por `.htaccess`, pero lo correcto es guardarlo fuera de `htdocs`.
 6. **Usuario de base de datos propio** (recomendado): instrucciones al final de `migracion_01_seguridad.sql`.
@@ -28,13 +32,30 @@ validarla; habría que restaurar el respaldo de la base o reasignarles la contra
 Después de actualizar, cada usuario debe iniciar sesión otra vez. Las contraseñas antiguas siguen funcionando
 y se convierten a formato seguro (bcrypt) automáticamente en ese primer inicio de sesión.
 
-## Roles y permisos
+## Respaldos
+
+Hay que respaldar **dos cosas**:
+1. La base de datos (phpMyAdmin → Exportar).
+2. La carpeta de informes médicos de Imágenes: `C:\xampp\informes_imagenes` (`INFORMES_DIR` en `config.php`).
+   Los archivos están fuera de `htdocs` a propósito: solo se abren desde el sistema, que revisa la sesión y el área,
+   y cada consulta queda en la auditoría.
+
+## Áreas, roles y permisos
+
+Cada usuario tiene un **rol** (Administrador o Empleado) y un **área** (Cardiología o Imágenes).
+- **Administradores**: ven y gestionan todas las áreas. Crean usuarios (también otros administradores).
+- **Empleados**: solo ven los módulos de su área. Un empleado de Imágenes no ve ecos, holters ni MAPA, y al revés;
+  en el historial de pacientes solo aparecen los estudios de su área.
+- Un cambio de área o de rol se aplica al instante, sin que el usuario tenga que volver a entrar.
 
 | Acción | Administrador | Empleado | Empleado autorizado¹ |
 |---|:-:|:-:|:-:|
-| Ver, agregar y editar ecos, holters y MAPA | ✔ | ✔ | ✔ |
-| Eliminar ecos, holters y MAPA (van a la papelera) | ✔ | ✘ | ✔ |
-| Historial de pacientes | ✔ | ✔ | ✔ |
+| Ver, agregar y editar los estudios de su área | ✔ (todas) | ✔ | ✔ |
+| Subir, reemplazar y quitar informes (Imágenes) | ✔ | ✔ | ✔ |
+| Eliminar estudios (van a la papelera) | ✔ | ✘ | ✔ |
+| Agregar y editar tipos de estudio (Imágenes) | ✔ | ✔ | ✔ |
+| Eliminar tipos de estudio | ✔ | ✘ | ✘ |
+| Historial de pacientes (de su área) | ✔ (todas) | ✔ | ✔ |
 | Agregar y editar médicos | ✔ | ✔ | ✔ |
 | Eliminar médicos | ✔ | ✘ | ✘ |
 | Centros de costo | ✔ | ✘ | ✘ |
@@ -50,7 +71,9 @@ Todos los permisos se validan en el servidor, no solo en la pantalla.
 - **Auditoría** (menú Módulos → Auditoría): quién creó, editó o eliminó cada registro y cuándo, con los campos que cambiaron;
   cambios de usuarios; inicios de sesión correctos, fallidos y bloqueados.
 - **Papelera**: eliminar un estudio no lo borra; un administrador lo restaura desde Auditoría.
-- **Historial de pacientes**: busca por cédula o nombre y muestra juntos todos sus ecos, holters y MAPA.
+- **Historial de pacientes**: busca por cédula o nombre y muestra juntos todos los estudios del paciente de las áreas que el usuario puede ver.
+- **Informes médicos (Imágenes)**: PDF o Word (.doc/.docx) de hasta `INFORME_MAX_MB` MB. Se revisa el contenido real del archivo,
+  no solo la extensión. Los PDF se abren en una pestaña; los Word se descargan.
 - **Autocompletar**: al escribir la cédula en "Nuevo", el sistema ofrece los datos ya registrados del paciente.
   No hay una tabla única de pacientes a propósito: la misma cédula puede corresponder a más de una persona
   (por ejemplo, menores registrados con la cédula de un familiar), así que el usuario elige.
@@ -64,7 +87,7 @@ index.php                  Login
 documents/app/
   config/config.php        Configuración (único archivo a editar al instalar)
   core/                    Arranque, sesión y permisos, CSRF, validación, auditoría
-  models/                  Acceso a datos (consultas preparadas). EstudioModel es común a ecos/holters/mapas
+  models/                  Acceso a datos (consultas preparadas). EstudioModel es común a ecos/holters/mapas/imágenes
   controllers/             Endpoints AJAX: un archivo por acción, todos validan sesión y permisos
   views/                   Páginas, tablas (fragmentos AJAX), modales y JS de cada módulo
   database/                Respaldo y migraciones (bloqueado al navegador)
@@ -72,7 +95,7 @@ documents/assets/          CSS, JS y fuentes locales
 ```
 
 Respuestas de los controladores: `1` éxito, `2` registro repetido, `3` caso especial (contraseña corta / tiene estudios asociados),
-`4` datos inválidos, `0` error. Sesión vencida → HTTP 401; sin permiso o token CSRF inválido → HTTP 403.
+`4` datos inválidos, `5` informe no válido o muy grande, `6` estudio guardado pero el informe no, `0` error. Sesión vencida → HTTP 401; sin permiso o token CSRF inválido → HTTP 403.
 
 Al modificar archivos JS o CSS propios, subir `ASSET_VERSION` en `config.php` para que los navegadores descarguen la versión nueva.
 

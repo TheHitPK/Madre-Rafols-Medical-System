@@ -15,6 +15,7 @@
 				<th class="text-center">Cédula</th>
 				<th class="text-center">Usuario</th>
 				<th class="text-center">Rol</th>
+				<th class="text-center">Área</th>
 				<th class="text-center">Estado</th>
 				<th class="text-center"><span class="visually-hidden">Acciones</span></th>
 			</tr>
@@ -36,6 +37,7 @@
                                 <i class="fa-solid <?php echo $esAdmin ? "fa-user-tie" : "fa-user";?>" aria-hidden="true"></i>&nbsp;<?php echo e($value['rol']);?>
                             </span>
                         </td>
+                        <td><?php echo $esAdmin ? '<span class="text-muted">Todas</span>' : e($value['departamento']);?></td>
                         <td>
                             <span style="font-size: 15px; width: 100px;" class="badge text-light shadow <?php echo $activo ? "bg-success" : "bg-danger";?>">
                                 <i class="fa-solid <?php echo $activo ? "fa-user-check" : "fa-user-lock";?>" aria-hidden="true"></i>&nbsp;<?php echo e($value['estado']);?>

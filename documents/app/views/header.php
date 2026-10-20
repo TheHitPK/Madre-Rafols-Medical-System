@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token());?>">
 
-    <title>Cardiología - <?php echo e(isset($pageTitle) ? $pageTitle : 'Inicio');?></title>
+    <title><?php echo e(nombre_sistema());?> - <?php echo e(isset($pageTitle) ? $pageTitle : 'Inicio');?></title>
 
     <!--FAVICON-->
     <link rel="shortcut icon" href="../../assets/img/logo.png" type="image/x-icon">

@@ -13,8 +13,8 @@
     }
 
     $Pacientes = new Pacientes();
-    $estudios  = $Pacientes -> historial($termino);
-    $colores   = array('ecos' => 'bg-primary', 'holters' => 'bg-success', 'mapas' => 'bg-warning text-dark');
+    $estudios  = $Pacientes -> historial($termino, areas_visibles());
+    $colores   = array('ecos' => 'bg-primary', 'holters' => 'bg-success', 'mapas' => 'bg-warning text-dark', 'imagenes' => 'bg-secondary');
 ?>
     <?php if (count($estudios) === 500) { ?>
         <div class="alert alert-warning"><i class="fa-solid fa-triangle-exclamation"></i> Se muestran los primeros 500 resultados. Afine la búsqueda.</div>
@@ -51,5 +51,5 @@
     </table>
 
     <script>
-        initTablaSimple(<?php echo json_encode(array('id' => 'tablePacientes', 'titulo' => 'Historial de estudios - ' . $termino, 'orden' => array(array(1, 'desc'))), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);?>);
+        initTablaSimple(<?php echo json_encode(array('id' => 'tablePacientes', 'titulo' => 'Historial de estudios - ' . $termino, 'departamento' => nombre_sistema(), 'orden' => array(array(1, 'desc'))), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);?>);
     </script>

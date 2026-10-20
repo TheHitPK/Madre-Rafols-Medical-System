@@ -1,9 +1,14 @@
 <?php
     /*
-     * LÓGICA COMÚN DE LOS CONTROLADORES DE ESTUDIOS (ecos, holters, mapas)
+     * LÓGICA COMÚN DE LOS CONTROLADORES DE ESTUDIOS (ecos, holters, mapas, imágenes)
      * Los nombres de los campos del formulario siguen el patrón del front:
      *   agregar:    factura_eco,        idC_costo,        idMedico, ...
      *   actualizar: factura_eco_update, idC_costo_update, idMedico_update, ... + idEco
+     *
+     * Cada estudio pertenece a un área: un empleado de otra área recibe 403.
+     * Ganchos opcionales (los usa Imágenes para el informe médico):
+     *   'validar' => function()    se ejecuta antes de guardar; puede cortar con responder()
+     *   'despues' => function($id) se ejecuta después de guardar; devuelve la respuesta final
      *
      * Respuestas: 1 = OK, 2 = factura repetida para el paciente, 4 = datos inválidos, 0 = error
      */
@@ -11,16 +16,21 @@
     require_once __DIR__ . "/../models/EcoModel.php";
     require_once __DIR__ . "/../models/HolterModel.php";
     require_once __DIR__ . "/../models/MapaModel.php";
+    require_once __DIR__ . "/../models/ImagenModel.php";
 
     // Modelos por nombre de tabla: 'ecos' => Ecos, ...
     function modelos_estudio(){
-        return array('ecos' => new Ecos(), 'holters' => new Holters(), 'mapas' => new Mapas());
+        return array('ecos' => new Ecos(), 'holters' => new Holters(), 'mapas' => new Mapas(), 'imagenes' => new Imagenes());
     }
 
     function datos_estudio_desde_post($modelo, $sufijoCampo){
         $s = $modelo -> sufijo();
         $u = $sufijoCampo;
-        return array('idC_costo'  => post_entero("idC_costo$u"),
+        $extras = array();
+        foreach ($modelo -> camposExtra() as $campo) {
+            $extras[$campo] = post_entero("$campo$u");
+        }
+        return $extras + array('idC_costo'  => post_entero("idC_costo$u"),
                      'idMedico'   => post_entero("idMedico$u"),
                      'factura'    => post_texto("factura_$s$u", $modelo -> longitudFactura()),
                      'fecha'      => post_fecha("fecha_$s$u"),
@@ -38,20 +48,32 @@
         }
     }
 
-    function estudio_agregar($modelo){
+    function estudio_agregar($modelo, $ganchos = array()){
         api_escritura();
+        requerir_area_api($modelo -> area());
+        if (isset($ganchos['validar'])) {
+            $ganchos['validar']();
+        }
         $datos = datos_estudio_desde_post($modelo, "");
         validar_estudio($datos);
         $resultado = $modelo -> agregar($datos, usuario_actual_id());
         if ($resultado === 1) {
-            $nuevo = $modelo -> obtener($modelo -> ultimoId());
-            auditar('crear', $modelo -> tabla(), $modelo -> ultimoId(), $modelo -> describir($nuevo), null, $modelo -> datosAuditables($nuevo));
+            $id = $modelo -> ultimoId();
+            if (isset($ganchos['despues'])) {
+                $resultado = $ganchos['despues']($id);
+            }
+            $nuevo = $modelo -> obtener($id);
+            auditar('crear', $modelo -> tabla(), $id, $modelo -> describir($nuevo), null, $modelo -> datosAuditables($nuevo));
         }
         echo $resultado;
     }
 
-    function estudio_actualizar($modelo){
+    function estudio_actualizar($modelo, $ganchos = array()){
         api_escritura();
+        requerir_area_api($modelo -> area());
+        if (isset($ganchos['validar'])) {
+            $ganchos['validar']();
+        }
         $datos = datos_estudio_desde_post($modelo, "_update");
         $datos['id'] = post_entero($modelo -> campoId());
         validar_estudio($datos);
@@ -62,6 +84,9 @@
         }
         $resultado = $modelo -> actualizar($datos, usuario_actual_id());
         if ($resultado === 1) {
+            if (isset($ganchos['despues'])) {
+                $resultado = $ganchos['despues']($datos['id']);
+            }
             $nuevo   = $modelo -> obtener($datos['id']);
             $cambios = diferencias($modelo -> datosAuditables($anterior), $modelo -> datosAuditables($nuevo));
             if (count($cambios) > 0) {
@@ -74,6 +99,7 @@
 
     function estudio_obtener($modelo){
         api_lectura();
+        requerir_area_api($modelo -> area());
         $id = post_entero($modelo -> campoId());
         if ($id === null) {
             responder("4");
@@ -84,6 +110,7 @@
 
     function estudio_eliminar($modelo){
         api_escritura();
+        requerir_area_api($modelo -> area());
         if (!puede_eliminar_estudios()) {
             responder("SIN_PERMISO", 403);
         }
@@ -103,6 +130,7 @@
     // Con ids[] se importan de una vez las marcas que el navegador tenía guardadas localmente.
     function estudio_marcar($modelo){
         api_escritura();
+        requerir_area_api($modelo -> area());
         if (isset($_POST['ids']) && is_array($_POST['ids'])) {
             $ids = array();
             foreach (array_slice($_POST['ids'], 0, 5000) as $id) {

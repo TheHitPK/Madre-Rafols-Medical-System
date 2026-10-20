@@ -8,7 +8,7 @@
 <nav class="sb-topnav navbar navbar-expand navbar-dark" aria-label="Barra superior" style="background-color: #001d3d;">
 
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="home.php"><img src="../../assets/img/main_logo.png" alt="Cardiología - ir al inicio" width="50" height="50"></a>
+    <a class="navbar-brand ps-3" href="home.php"><img src="../../assets/img/main_logo.png" alt="<?php echo e(nombre_sistema());?> - ir al inicio" width="50" height="50"></a>
 
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" type="button" aria-label="Mostrar u ocultar el menú lateral"><i class="fas fa-bars"></i></button>
@@ -43,7 +43,10 @@
                         Dashboard
                     </a>
 
-                    <div class="sb-sidenav-menu-heading">Exámenes</div>
+                    <?php
+                        if (puede_ver_area(AREA_CARDIOLOGIA)) {
+                    ?>
+                    <div class="sb-sidenav-menu-heading">Cardiología</div>
 
                     <a <?php echo atributos_menu('ecocardiogramas.php');?> href="ecocardiogramas.php">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-heart-circle-check" aria-hidden="true"></i></div>
@@ -59,6 +62,21 @@
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-stethoscope" aria-hidden="true"></i></div>
                         Mapas
                     </a>
+                    <?php
+                        }
+                        if (puede_ver_area(AREA_IMAGENES)) {
+                    ?>
+                    <div class="sb-sidenav-menu-heading">Imágenes</div>
+
+                    <a <?php echo atributos_menu('imagenes.php');?> href="imagenes.php">
+                        <div class="sb-nav-link-icon"><i class="fa-solid fa-x-ray" aria-hidden="true"></i></div>
+                        Estudios de imágenes
+                    </a>
+                    <?php
+                        }
+                    ?>
+
+                    <div class="sb-sidenav-menu-heading">Pacientes</div>
 
                     <a <?php echo atributos_menu('pacientes.php');?> href="pacientes.php">
                         <div class="sb-nav-link-icon"><i class="fa-solid fa-hospital-user" aria-hidden="true"></i></div>
@@ -86,7 +104,7 @@
             </div>
             <div class="sb-sidenav-footer" style="background-color: #003566;">
                 <div class="small">Sesión Activa:</div>
-                <i class="fa-solid fa-user"></i> <?php echo e($_SESSION["rol"]);?>
+                <i class="fa-solid fa-user" aria-hidden="true"></i> <?php echo e($_SESSION["rol"]);?><?php if (!es_admin() && isset($_SESSION["departamento"])) { echo " - " . e($_SESSION["departamento"]); }?>
             </div>
         </nav>
     </div>

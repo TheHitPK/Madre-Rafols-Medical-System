@@ -213,14 +213,14 @@ var DT_LONGITUDES = [
     [ '5 filas', '10 filas', '25 filas', '50 filas', 'Mostrar todo' ]
 ];
 
-function tituloReporte(titulo) {
+function tituloReporte(titulo, departamento) {
     var f = new Date();
-    return "Departamento de Cardiología\n " + titulo + " - " + f.getDate() + "/" + (f.getMonth() + 1) + "/" + f.getFullYear();
+    return "Departamento de " + (departamento || "Cardiología") + "\n " + titulo + " - " + f.getDate() + "/" + (f.getMonth() + 1) + "/" + f.getFullYear();
 }
 
 // Botones de copiar / imprimir / Excel / PDF / cantidad de filas
 function botonesExportacion(opciones) {
-    var titulo = function() { return tituloReporte(opciones.titulo); };
+    var titulo = function() { return tituloReporte(opciones.titulo, opciones.departamento); };
     var botonPdf = {
         extend:    'pdf',
         text:      '<i class="fa-solid fa-file-pdf" aria-hidden="true"></i>',
@@ -474,39 +474,58 @@ function initTablaEstudio(opciones) {
     prepararFiltroFechas(2); // columna "Fecha"
     $tabla.addClass('filtro-fechas');
 
+    var columnas = [
+        { data: null, responsivePriority: 9, render: function(d, tipo, fila, meta) { return meta.row + 1; } }, // N° en orden de fecha, como antes
+        { data: 'factura', className: 'text-start', responsivePriority: 3, render: function(factura, tipo, fila) {
+            if (tipo !== 'display') {
+                return factura;
+            }
+            var titulo = fila.marcado && fila.marcado_por ? ' title="Marcado por ' + escaparHtml(fila.marcado_por) + ' el ' + escaparHtml(fila.marcado_en) + '"' : '';
+            return '<input type="checkbox" class="marca" data-id="' + fila.id + '" aria-label="Marcar ' + (factura ? 'factura ' + escaparHtml(factura) : 'registro sin factura') + ' de ' + escaparHtml(fila.paciente) + '"' + (fila.marcado ? ' checked' : '') + titulo + '>&nbsp; ' + escaparHtml(factura);
+        } },
+        { data: 'fecha', responsivePriority: 4, render: celdaTexto },
+        { data: 'c_costo', className: 'celda-mayusculas', responsivePriority: 6, render: celdaTexto },
+        { data: 'paciente', className: 'celda-mayusculas', responsivePriority: 2, render: celdaTexto },
+        { data: 'cedula', responsivePriority: 5, render: celdaTexto },
+        { data: 'n_historia', responsivePriority: 8, render: celdaTexto },
+        { data: 'medico', className: 'celda-mayusculas', responsivePriority: 7, render: celdaTexto },
+        { data: null, orderable: false, searchable: false, responsivePriority: 1, render: function(d, tipo, fila) {
+            if (tipo !== 'display') {
+                return '';
+            }
+            // Botones reales (alcanzables con Tab) con nombre que incluye al paciente
+            var paciente = escaparHtml(fila.paciente);
+            var eliminar = opciones.puedeEliminar
+                ? '<button type="button" class="btn btn-sm btn-danger" onclick="delete' + nombre + 'Data(' + fila.id + ')" title="Eliminar" aria-label="Eliminar registro de ' + paciente + '"><span class="fa-solid fa-trash" aria-hidden="true"></span></button>'
+                : '';
+            return '<div class="btn-group shadow acciones-fila" role="group" aria-label="Acciones">'
+                 + '<button type="button" class="btn btn-sm btn-warning" onclick="obtain' + nombre + 'Data(' + fila.id + ')" data-bs-toggle="modal" data-bs-target="#update' + nombre + 'Modal" title="Editar" aria-label="Editar registro de ' + paciente + '"><span class="fa-solid fa-pen-to-square" aria-hidden="true"></span></button>'
+                 + eliminar + '</div>';
+        } }
+    ];
+
+    // Imágenes: tipo de estudio (después de la fecha) e informe médico (antes de las acciones).
+    if (opciones.conTipo) {
+        columnas.splice(3, 0, { data: 'tipo', className: 'celda-mayusculas', responsivePriority: 3, render: celdaTexto });
+        columnas.splice(columnas.length - 1, 0, { data: 'informe', responsivePriority: 4, render: function(informe, tipo, fila) {
+            if (tipo !== 'display') {
+                return informe ? 'Sí' : 'No';
+            }
+            if (!informe) {
+                return '<span class="text-muted small">Sin informe</span>';
+            }
+            var esPdf = /\.pdf$/i.test(informe);
+            return '<a class="btn btn-sm btn-outline-primary" href="' + opciones.urlInforme + '?id=' + fila.id + '" target="_blank" rel="noopener"'
+                 + ' title="' + escaparHtml(informe) + '" aria-label="' + (esPdf ? 'Ver' : 'Descargar') + ' informe de ' + escaparHtml(fila.paciente) + '">'
+                 + '<span class="fa-solid ' + (esPdf ? 'fa-file-pdf' : 'fa-file-word') + '" aria-hidden="true"></span> ' + (esPdf ? 'Ver' : 'Descargar') + '</a>';
+        } });
+    }
+
     var tabla = $tabla.DataTable({
         data: opciones.datos,
         deferRender: true,
         rowId: function(d) { return 'fila-' + opciones.modulo + '-' + d.id; },
-        columns: [
-            { data: null, responsivePriority: 9, render: function(d, tipo, fila, meta) { return meta.row + 1; } }, // N° en orden de fecha, como antes
-            { data: 'factura', className: 'text-start', responsivePriority: 3, render: function(factura, tipo, fila) {
-                if (tipo !== 'display') {
-                    return factura;
-                }
-                var titulo = fila.marcado && fila.marcado_por ? ' title="Marcado por ' + escaparHtml(fila.marcado_por) + ' el ' + escaparHtml(fila.marcado_en) + '"' : '';
-                return '<input type="checkbox" class="marca" data-id="' + fila.id + '" aria-label="Marcar ' + (factura ? 'factura ' + escaparHtml(factura) : 'registro sin factura') + ' de ' + escaparHtml(fila.paciente) + '"' + (fila.marcado ? ' checked' : '') + titulo + '>&nbsp; ' + escaparHtml(factura);
-            } },
-            { data: 'fecha', responsivePriority: 4, render: celdaTexto },
-            { data: 'c_costo', className: 'celda-mayusculas', responsivePriority: 6, render: celdaTexto },
-            { data: 'paciente', className: 'celda-mayusculas', responsivePriority: 2, render: celdaTexto },
-            { data: 'cedula', responsivePriority: 5, render: celdaTexto },
-            { data: 'n_historia', responsivePriority: 8, render: celdaTexto },
-            { data: 'medico', className: 'celda-mayusculas', responsivePriority: 7, render: celdaTexto },
-            { data: null, orderable: false, searchable: false, responsivePriority: 1, render: function(d, tipo, fila) {
-                if (tipo !== 'display') {
-                    return '';
-                }
-                // Botones reales (alcanzables con Tab) con nombre que incluye al paciente
-                var paciente = escaparHtml(fila.paciente);
-                var eliminar = opciones.puedeEliminar
-                    ? '<button type="button" class="btn btn-sm btn-danger" onclick="delete' + nombre + 'Data(' + fila.id + ')" title="Eliminar" aria-label="Eliminar registro de ' + paciente + '"><span class="fa-solid fa-trash" aria-hidden="true"></span></button>'
-                    : '';
-                return '<div class="btn-group shadow acciones-fila" role="group" aria-label="Acciones">'
-                     + '<button type="button" class="btn btn-sm btn-warning" onclick="obtain' + nombre + 'Data(' + fila.id + ')" data-bs-toggle="modal" data-bs-target="#update' + nombre + 'Modal" title="Editar" aria-label="Editar registro de ' + paciente + '"><span class="fa-solid fa-pen-to-square" aria-hidden="true"></span></button>'
-                     + eliminar + '</div>';
-            } }
-        ],
+        columns: columnas,
         // Del más reciente al más antiguo: por fecha y, en el mismo día, por orden de registro
         order: [[2, 'desc'], [0, 'desc']],
         responsive: true,

@@ -22,14 +22,17 @@
                       'login'           => array('Inicio de sesión', 'bg-light text-dark'),
                       'login_fallido'   => array('Login fallido', 'bg-danger'),
                       'login_inactivo'  => array('Login inactivo', 'bg-secondary'),
-                      'login_bloqueado' => array('Login bloqueado', 'bg-dark'));
+                      'login_bloqueado' => array('Login bloqueado', 'bg-dark'),
+                      'ver_informe'     => array('Informe consultado', 'bg-light text-dark'));
     $modulos  = array('ecos' => 'Ecos', 'holters' => 'Holters', 'mapas' => 'Mapas', 'usuarios' => 'Usuarios',
-                      'medicos' => 'Médicos', 'c_costo' => 'Centros de costo', 'sesion' => 'Sesión');
+                      'medicos' => 'Médicos', 'c_costo' => 'Centros de costo', 'sesion' => 'Sesión',
+                      'imagenes' => 'Imágenes', 'tipos_estudio' => 'Tipos de estudio');
     $campos   = array('fecha' => 'Fecha', 'factura' => 'Factura', 'nombre' => 'Nombre', 'apellido' => 'Apellido',
                       'cedula' => 'Cédula', 'n_historia' => 'Nº historia', 'centro_costo' => 'Centro de costo', 'medico' => 'Médico',
                       'nombre_usuario' => 'Nombre', 'apellido_usuario' => 'Apellido', 'cedula_usuario' => 'Cédula',
-                      'usuario' => 'Usuario', 'rol' => 'Rol', 'estado' => 'Estado', 'contraseña' => 'Contraseña');
-    $ocultos  = array('idUsuario', 'idRol', 'idEstado');
+                      'usuario' => 'Usuario', 'rol' => 'Rol', 'estado' => 'Estado', 'contraseña' => 'Contraseña',
+                      'tipo_estudio' => 'Tipo de estudio', 'informe' => 'Informe médico', 'departamento' => 'Área');
+    $ocultos  = array('idUsuario', 'idRol', 'idEstado', 'idDepartamento');
     $ofrecidos = array();
 ?>
     <table class="table table-hover display compact animate__animated animate__fadeIn" style="width: 100%;" id="tableAuditoria">

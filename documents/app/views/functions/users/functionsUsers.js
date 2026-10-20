@@ -77,6 +77,7 @@ function obtainUserData(idUsuario) {
 			$('#cedula_usuario_update').val(r['cedula_usuario']);
 			$('#usuario_update').val(r['usuario']);
 			$('#idRol_update').val(r['idRol']);
+			$('#idDepartamento_update').val(r['idDepartamento']);
 		}
 	});
 }

@@ -13,5 +13,5 @@
     }
 
     $Pacientes = new Pacientes();
-    echo json_encode($Pacientes -> datosPorCedula($cedula));
+    echo json_encode($Pacientes -> datosPorCedula($cedula, areas_visibles()));
 ?>

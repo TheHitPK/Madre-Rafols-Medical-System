@@ -2,9 +2,9 @@
     /*
      * SESIÓN, AUTENTICACIÓN, PERMISOS Y CSRF
      *
-     * Vistas (páginas completas):      requerir_login_pagina();   requerir_admin_pagina();
+     * Vistas (páginas completas):      requerir_login_pagina();   requerir_admin_pagina();   requerir_area_pagina(AREA_...);
      * Controladores que leen datos:    api_lectura();
-     * Controladores que modifican:     api_escritura();           requerir_admin_api();
+     * Controladores que modifican:     api_escritura();           requerir_admin_api();      requerir_area_api(AREA_...);
      */
 
     function iniciar_sesion($soloLectura = false){
@@ -39,15 +39,16 @@
         }
 
         // El usuario debe seguir existiendo y activo: si un administrador lo desactiva o elimina,
-        // pierde el acceso de inmediato. Un cambio de rol también se aplica al instante.
-        $query_usuario = Connection::connect() -> prepare("SELECT idEstado, idRol FROM usuarios WHERE idUsuario = :idUsuario");
+        // pierde el acceso de inmediato. Un cambio de rol o de área también se aplica al instante.
+        $query_usuario = Connection::connect() -> prepare("SELECT idEstado, idRol, idDepartamento FROM usuarios WHERE idUsuario = :idUsuario");
         $query_usuario -> bindValue(":idUsuario", (int)$_SESSION['idUsuario'], PDO::PARAM_INT);
         $query_usuario -> execute();
         $usuario = $query_usuario -> fetch(PDO::FETCH_ASSOC);
         if (!$usuario || (int)$usuario['idEstado'] !== ESTADO_ACTIVO) {
             return false;
         }
-        $_SESSION['idRol'] = (int)$usuario['idRol'];
+        $_SESSION['idRol']          = (int)$usuario['idRol'];
+        $_SESSION['idDepartamento'] = (int)$usuario['idDepartamento'];
         return true;
     }
 
@@ -63,6 +64,8 @@
         $_SESSION['estado']           = $usuario['estado'];
         $_SESSION['idRol']            = (int)$usuario['idRol'];
         $_SESSION['rol']              = $usuario['rol'];
+        $_SESSION['idDepartamento']   = (int)$usuario['idDepartamento'];
+        $_SESSION['departamento']     = $usuario['departamento'];
         $_SESSION['nombre_usuario']   = $usuario['nombre_usuario'];
         $_SESSION['apellido_usuario'] = $usuario['apellido_usuario'];
         $_SESSION['cedula_usuario']   = (int)$usuario['cedula_usuario'];
@@ -100,6 +103,14 @@
         }
     }
 
+    // Páginas de un área (Cardiología, Imágenes): los empleados de otra área ven "Acceso denegado".
+    function requerir_area_pagina($area){
+        if (!puede_ver_area($area)) {
+            header("Location: error.php");
+            exit;
+        }
+    }
+
     // ---------- CONTROLADORES / FRAGMENTOS AJAX ----------
 
     function api_lectura(){
@@ -126,10 +137,34 @@
         }
     }
 
+    function requerir_area_api($area){
+        if (!puede_ver_area($area)) {
+            responder("SIN_PERMISO", 403);
+        }
+    }
+
     // ---------- PERMISOS ----------
 
     function es_admin(){
         return isset($_SESSION['idRol']) && (int)$_SESSION['idRol'] === ROL_ADMIN;
+    }
+
+    function area_usuario(){
+        return isset($_SESSION['idDepartamento']) ? (int)$_SESSION['idDepartamento'] : AREA_CARDIOLOGIA;
+    }
+
+    // Los administradores ven todas las áreas; los empleados, solo la suya.
+    function puede_ver_area($area){
+        return es_admin() || area_usuario() === (int)$area;
+    }
+
+    function areas_visibles(){
+        return array_values(array_filter(array(AREA_CARDIOLOGIA, AREA_IMAGENES), 'puede_ver_area'));
+    }
+
+    // Nombre que se muestra en el título de las páginas: el área del empleado, o el del sistema para los administradores.
+    function nombre_sistema(){
+        return (!es_admin() && area_usuario() === AREA_IMAGENES) ? 'Imágenes' : 'Cardiología';
     }
 
     function usuario_actual_id(){

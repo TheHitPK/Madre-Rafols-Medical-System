@@ -31,6 +31,17 @@
     define('ROL_ADMIN', 1);
     define('ROL_EMPLEADO', 2);
 
+    // ÁREAS (tabla `departamentos`). Los empleados solo ven su área; los administradores, todas.
+    define('AREA_CARDIOLOGIA', 1);
+    define('AREA_IMAGENES', 2);
+
+    // INFORMES MÉDICOS DE IMÁGENES (PDF o Word)
+    // Carpeta donde se guardan los archivos. Debe estar FUERA de htdocs para que nadie pueda
+    // abrirlos con un enlace directo: solo se descargan a través del sistema, que revisa los permisos.
+    // Se crea sola la primera vez. Incluirla en los respaldos junto con la base de datos.
+    define('INFORMES_DIR', 'C:/xampp/informes_imagenes');
+    define('INFORME_MAX_MB', 20);
+
     // ESTADOS (tabla `estado`)
     define('ESTADO_ACTIVO', 1);
     define('ESTADO_INACTIVO', 2);
@@ -47,5 +58,5 @@
 
     // Versión de los JS/CSS propios. Subir este número al modificarlos para que los
     // navegadores descarguen la versión nueva en vez de usar la que tienen en caché.
-    define('ASSET_VERSION', '2026.10.20-orden');
+    define('ASSET_VERSION', '2026.10.20-imagenes');
 ?>

@@ -1,7 +1,7 @@
 <?php
     if (!isset($tablaEstudio)) { exit; } // solo se usa incluido, nunca directamente
     /*
-     * TABLA COMÚN DE ESTUDIOS (ecos, holters, mapas)
+     * TABLA COMÚN DE ESTUDIOS (ecos, holters, mapas, imágenes)
      * Se incluye desde tables/<modulo>/table<Modulo>s.php, que define $tablaEstudio:
      *   modelo  -> instancia del modelo (Ecos, Holters, Mapas)
      *   id      -> id HTML de la tabla (tableEcos)
@@ -12,21 +12,30 @@
      * Con miles de registros, enviarlas como HTML hacía que el navegador tardara ~8 segundos en mostrar la tabla.
      * La búsqueda, el orden, el filtro de fechas y las exportaciones siguen usando TODOS los registros.
      */
+    requerir_area_api($tablaEstudio['modelo'] -> area());
+
     $nombre = $tablaEstudio['nombre'];
+    // Imágenes agrega el tipo de estudio y el informe médico.
+    $conTipo = in_array('idTipoEstudio', $tablaEstudio['modelo'] -> camposExtra(), true);
 
     $filas = array();
     foreach ($tablaEstudio['modelo'] -> listar() as $registro) {
-        $filas[] = array('id'          => (int)$registro['id'],
-                         'factura'     => (string)$registro['factura'],
-                         'fecha'       => $registro['fecha'],
-                         'c_costo'     => $registro['c_costo'],
-                         'paciente'    => trim($registro['nombre'] . " " . $registro['apellido']),
-                         'cedula'      => (string)$registro['cedula'],
-                         'n_historia'  => (string)$registro['n_historia'],
-                         'medico'      => $registro['medico'],
-                         'marcado'     => (bool)$registro['marcado'],
-                         'marcado_por' => $registro['marcado_por'],
-                         'marcado_en'  => $registro['marcado_en']);
+        $fila = array('id'          => (int)$registro['id'],
+                      'factura'     => (string)$registro['factura'],
+                      'fecha'       => $registro['fecha'],
+                      'c_costo'     => $registro['c_costo'],
+                      'paciente'    => trim($registro['nombre'] . " " . $registro['apellido']),
+                      'cedula'      => (string)$registro['cedula'],
+                      'n_historia'  => (string)$registro['n_historia'],
+                      'medico'      => $registro['medico'],
+                      'marcado'     => (bool)$registro['marcado'],
+                      'marcado_por' => $registro['marcado_por'],
+                      'marcado_en'  => $registro['marcado_en']);
+        if ($conTipo) {
+            $fila['tipo']    = $registro['tipo_estudio'];
+            $fila['informe'] = $registro['informe_archivo'] !== null ? (string)$registro['informe_nombre'] : '';
+        }
+        $filas[] = $fila;
     }
 
     $opcionesTabla = array_merge(array('id'            => $tablaEstudio['id'],
@@ -37,6 +46,8 @@
                                        'campoId'       => $tablaEstudio['modelo'] -> campoId(),
                                        'urlMarcar'     => "../controllers/" . $tablaEstudio['modelo'] -> tabla() . "/mark{$nombre}Data.php",
                                        'puedeEliminar' => puede_eliminar_estudios(),
+                                       'conTipo'       => $conTipo,
+                                       'urlInforme'    => $conTipo ? "../controllers/" . $tablaEstudio['modelo'] -> tabla() . "/verInforme.php" : null,
                                        'datos'         => $filas), $tablaEstudio['opciones']);
 
     // JSON_HEX_* impide que un dato con "</script>" o comillas rompa el bloque <script>.
@@ -48,11 +59,13 @@
                 <th class="text-center">N°</th>
                 <th class="text-center">Factura</th>
                 <th class="text-center">Fecha</th>
+                <?php if ($conTipo) { ?><th class="text-center">Tipo de estudio</th><?php } ?>
                 <th class="text-center">Centro de Costo</th>
                 <th class="text-center">Paciente</th>
                 <th class="text-center">Cédula</th>
                 <th class="text-center">Nº de historia</th>
                 <th class="text-center">Médico</th>
+                <?php if ($conTipo) { ?><th class="text-center">Informe</th><?php } ?>
                 <th class="text-center"><span class="visually-hidden">Acciones</span></th>
             </tr>
         </thead>

@@ -1,14 +1,22 @@
 <?php
     /*
-     * LÓGICA COMÚN DE LOS CONTROLADORES DE CATÁLOGOS (centros de costo, médicos)
+     * LÓGICA COMÚN DE LOS CONTROLADORES DE CATÁLOGOS (centros de costo, médicos, tipos de estudio)
      * Campos del formulario: agregar -> medico | actualizar -> idMedico + medico_update
      *
      * Respuestas: 1 = OK, 2 = nombre repetido, 3 = tiene estudios asociados, 4 = datos inválidos, 0 = error
      */
     require_once __DIR__ . "/auditoria.php";
 
+    // Un catálogo de un área (tipos de estudio de Imágenes) solo lo usan quienes ven esa área.
+    function catalogo_requerir_area($modelo){
+        if ($modelo -> area() !== null) {
+            requerir_area_api($modelo -> area());
+        }
+    }
+
     function catalogo_agregar($modelo, $soloAdmin = false){
         api_escritura();
+        catalogo_requerir_area($modelo);
         if ($soloAdmin) {
             requerir_admin_api();
         }
@@ -25,6 +33,7 @@
 
     function catalogo_actualizar($modelo, $soloAdmin = false){
         api_escritura();
+        catalogo_requerir_area($modelo);
         if ($soloAdmin) {
             requerir_admin_api();
         }
@@ -44,6 +53,7 @@
 
     function catalogo_obtener($modelo){
         api_lectura();
+        catalogo_requerir_area($modelo);
         $id = post_entero($modelo -> campoId());
         if ($id === null) {
             responder("4");
@@ -54,6 +64,7 @@
 
     function catalogo_eliminar($modelo){
         api_escritura();
+        catalogo_requerir_area($modelo);
         requerir_admin_api();
         $id = post_entero($modelo -> campoId());
         if ($id === null) {

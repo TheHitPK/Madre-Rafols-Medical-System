@@ -8,13 +8,16 @@
                                        B.estado,
                                        A.idRol,
                                        C.rol,
+                                       A.idDepartamento,
+                                       D.departamento,
                                        A.nombre_usuario,
                                        A.apellido_usuario,
                                        A.cedula_usuario,
                                        A.usuario
                                 FROM usuarios A
-                                INNER JOIN estado B ON A.idEstado = B.idEstado
-                                INNER JOIN rol C    ON A.idRol = C.idRol
+                                INNER JOIN estado B        ON A.idEstado = B.idEstado
+                                INNER JOIN rol C           ON A.idRol = C.idRol
+                                INNER JOIN departamentos D ON A.idDepartamento = D.idDepartamento
                                 WHERE A.idUsuario <> :superAdmin";
             $query_showUserData = Connection::connect() -> prepare($showUserDataSQL);
             $query_showUserData -> bindValue(":superAdmin", SUPER_ADMIN_ID, PDO::PARAM_INT);
@@ -61,6 +64,7 @@
             }
             $addUserDataSQL = "INSERT INTO usuarios (idEstado,
                                                      idRol,
+                                                     idDepartamento,
                                                      nombre_usuario,
                                                      apellido_usuario,
                                                      cedula_usuario,
@@ -68,6 +72,7 @@
                                                      password)
                                VALUES (:idEstado,
                                        :idRol,
+                                       :idDepartamento,
                                        :nombre_usuario,
                                        :apellido_usuario,
                                        :cedula_usuario,
@@ -76,6 +81,7 @@
             $query_addUserData = Connection::connect() -> prepare($addUserDataSQL);
             $query_addUserData -> bindValue(":idEstado", ESTADO_ACTIVO, PDO::PARAM_INT);
             $query_addUserData -> bindValue(":idRol", $formAddUserData["idRol"], PDO::PARAM_INT);
+            $query_addUserData -> bindValue(":idDepartamento", $formAddUserData["idDepartamento"], PDO::PARAM_INT);
             $query_addUserData -> bindValue(":nombre_usuario", $formAddUserData["nombre_usuario"], PDO::PARAM_STR);
             $query_addUserData -> bindValue(":apellido_usuario", $formAddUserData["apellido_usuario"], PDO::PARAM_STR);
             $query_addUserData -> bindValue(":cedula_usuario", $formAddUserData["cedula_usuario"], PDO::PARAM_INT);
@@ -90,13 +96,16 @@
                                          B.estado,
                                          A.idRol,
                                          C.rol,
+                                         A.idDepartamento,
+                                         D.departamento,
                                          A.nombre_usuario,
                                          A.apellido_usuario,
                                          A.cedula_usuario,
                                          A.usuario
                                   FROM usuarios A
-                                  INNER JOIN estado B ON A.idEstado = B.idEstado
-                                  INNER JOIN rol C    ON A.idRol = C.idRol
+                                  INNER JOIN estado B        ON A.idEstado = B.idEstado
+                                  INNER JOIN rol C           ON A.idRol = C.idRol
+                                  INNER JOIN departamentos D ON A.idDepartamento = D.idDepartamento
                                   WHERE A.idUsuario = :idUsuario";
             $query_obtainUserData = Connection::connect() -> prepare($obtainUserDataSQL);
             $query_obtainUserData -> bindValue(":idUsuario", $idUsuario, PDO::PARAM_INT);
@@ -111,6 +120,7 @@
             $cambiarPassword = $formUpdateUserData["password_update"] !== '';
             $updateUserDataSQL = "UPDATE usuarios
                                   SET idRol            = :idRol_update,
+                                      idDepartamento   = :idDepartamento_update,
                                       nombre_usuario   = :nombre_usuario_update,
                                       apellido_usuario = :apellido_usuario_update,
                                       cedula_usuario   = :cedula_usuario_update,
@@ -120,6 +130,7 @@
             $query_updateUserData = Connection::connect() -> prepare($updateUserDataSQL);
             $query_updateUserData -> bindValue(":idUsuario", $formUpdateUserData["idUsuario"], PDO::PARAM_INT);
             $query_updateUserData -> bindValue(":idRol_update", $formUpdateUserData["idRol_update"], PDO::PARAM_INT);
+            $query_updateUserData -> bindValue(":idDepartamento_update", $formUpdateUserData["idDepartamento_update"], PDO::PARAM_INT);
             $query_updateUserData -> bindValue(":nombre_usuario_update", $formUpdateUserData["nombre_usuario_update"], PDO::PARAM_STR);
             $query_updateUserData -> bindValue(":apellido_usuario_update", $formUpdateUserData["apellido_usuario_update"], PDO::PARAM_STR);
             $query_updateUserData -> bindValue(":cedula_usuario_update", $formUpdateUserData["cedula_usuario_update"], PDO::PARAM_INT);
@@ -158,14 +169,17 @@
                                     B.estado,
                                     A.idRol,
                                     C.rol,
+                                    A.idDepartamento,
+                                    D.departamento,
                                     A.nombre_usuario,
                                     A.apellido_usuario,
                                     A.cedula_usuario,
                                     A.usuario,
                                     A.password
                              FROM usuarios A
-                             INNER JOIN estado B ON A.idEstado = B.idEstado
-                             INNER JOIN rol C    ON A.idRol = C.idRol
+                             INNER JOIN estado B        ON A.idEstado = B.idEstado
+                             INNER JOIN rol C           ON A.idRol = C.idRol
+                             INNER JOIN departamentos D ON A.idDepartamento = D.idDepartamento
                              WHERE A.usuario = :usuario
                              LIMIT 1";
             $query_userLogin = Connection::connect() -> prepare($userLoginSQL);
@@ -192,6 +206,18 @@
 
         public function showRoleData(){
             return Connection::connect() -> query("SELECT idRol, rol FROM rol") -> fetchAll();
+        }
+
+        public function showDepartamentoData(){
+            return Connection::connect() -> query("SELECT idDepartamento, departamento FROM departamentos ORDER BY idDepartamento") -> fetchAll();
+        }
+
+        public function showCountUsersAreaData($idDepartamento){
+            $query_countUsersArea = Connection::connect() -> prepare("SELECT COUNT(*) FROM usuarios WHERE idDepartamento = :idDepartamento AND idRol = :idRol");
+            $query_countUsersArea -> bindValue(":idDepartamento", $idDepartamento, PDO::PARAM_INT);
+            $query_countUsersArea -> bindValue(":idRol", ROL_EMPLEADO, PDO::PARAM_INT);
+            $query_countUsersArea -> execute();
+            return (int)$query_countUsersArea -> fetchColumn();
         }
 
         // ---------- CONTRASEÑAS ----------

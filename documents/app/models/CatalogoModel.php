@@ -2,7 +2,7 @@
     require_once "Connection.php";
 
     /*
-     * MODELO COMÚN DE CATÁLOGOS SIMPLES (centros de costo, médicos): una tabla con id + nombre.
+     * MODELO COMÚN DE CATÁLOGOS SIMPLES (centros de costo, médicos, tipos de estudio): una tabla con id + nombre.
      */
     abstract class Catalogo extends Connection{
         protected $tabla;    // medicos
@@ -19,6 +19,11 @@
 
         public function campo(){
             return $this -> campo;
+        }
+
+        // Área dueña del catálogo; null = compartido por todas (médicos, centros de costo).
+        public function area(){
+            return null;
         }
 
         public function listar(){

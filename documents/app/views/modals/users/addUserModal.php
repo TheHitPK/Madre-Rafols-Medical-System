@@ -56,6 +56,22 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="idDepartamento" class="form-label mb-1">Área:</label>
+                            <select class="form-select" name="idDepartamento" id="idDepartamento" aria-describedby="ayudaArea" required>
+                                <option value="">Seleccione...</option>
+                                <?php
+                                    foreach ($showDepartamentoData as $key => $value) {
+                                ?>
+                                        <option value="<?php echo (int)$value[0];?>"><?php echo e($value[1]);?></option>
+                                <?php
+                                    }
+                                ?>
+                            </select>
+                            <div class="form-text" id="ayudaArea">Un empleado solo ve los módulos de su área. Los administradores ven todas.</div>
+                        </div>
+                    </div>
 				</div>
 				<div class="modal-footer">
                     <button type="reset" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-ban" aria-hidden="true"></i> Cancelar</button>

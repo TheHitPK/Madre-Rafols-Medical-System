@@ -7,6 +7,20 @@ $.ajaxSetup({
     headers: { 'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content') }
 });
 
+// Los mensajes (SweetAlert) se anuncian con su título en los lectores de pantalla:
+// la librería crea el cuadro de diálogo sin nombre accesible.
+if (window.swal) {
+    var swalOriginal = window.swal;
+    window.swal = function() {
+        var resultado = swalOriginal.apply(this, arguments);
+        $('.swal-title').attr('id', 'swal-titulo');
+        $('.swal-modal').attr({ 'aria-labelledby': 'swal-titulo', 'aria-describedby': 'swal-texto' });
+        $('.swal-text').attr('id', 'swal-texto');
+        return resultado;
+    };
+    $.extend(window.swal, swalOriginal);
+}
+
 // Errores de sesión / permisos en un solo lugar (antes cada petición fallaba en silencio).
 var avisoSesionMostrado = false;
 $(document).ajaxError(function(evento, xhr) {
@@ -57,8 +71,8 @@ function cargarFragmento(contenedor, url, tablaId) {
 
 /*
  * Muestra el resultado de guardar/editar/eliminar según el código que devuelve el servidor:
- * 1 = éxito, 2 = registro repetido, 3 = caso especial del módulo, 4 = datos inválidos, otro = error.
- * Devuelve true si la operación fue exitosa.
+ * 1 = éxito, 2 = registro repetido, 3 y siguientes = casos especiales del módulo (con su mensaje),
+ * 4 = datos inválidos, otro = error. Devuelve true si la operación fue exitosa.
  */
 function mostrarResultado(respuesta, mensajes) {
     var r = String(respuesta).trim();
@@ -66,7 +80,7 @@ function mostrarResultado(respuesta, mensajes) {
         swal({ icon: "success", title: "¡ÉXITO!", text: mensajes[1] });
         return true;
     }
-    if ((r === "2" || r === "3") && mensajes[r]) {
+    if (r !== "0" && r !== "4" && mensajes[r]) {
         swal({ icon: "warning", title: "¡ATENCIÓN!", text: mensajes[r] });
     } else if (r === "4") {
         swal({ icon: "warning", title: "¡ATENCIÓN!", text: "Verifique los datos ingresados: hay campos vacíos o con formato inválido." });
